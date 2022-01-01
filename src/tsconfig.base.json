@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./../dist/server",
+    "alwaysStrict": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "allowUnusedLabels": false,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true
+  }
+}

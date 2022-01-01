@@ -8,6 +8,8 @@
     "allowUnusedLabels": false,
     "resolveJsonModule": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
   }
 }

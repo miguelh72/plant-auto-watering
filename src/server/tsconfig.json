@@ -1,10 +1,9 @@
 {
-  "compilerOptions": {
-    "module": "CommonJS",
-    "moduleResolution": "node"
-  },
   "extends": "./../tsconfig.base",
   "include": [
     "./**/*"
-  ]
+  ],
+  "compilerOptions": {
+    "module": "CommonJS",
+  }
 }

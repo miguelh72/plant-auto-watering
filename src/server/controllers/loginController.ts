@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 import * as deviceModel from './../models/devices';
 import { ShallowDevice } from '../../shared/types';
-import { getPasshash, getJWT } from './../utils/authenticate';
+import { getPasshash, getJWT, verify } from './../utils/authenticate';
 import { validateMAC } from './../../shared/validate';
 
 /**
@@ -34,4 +34,25 @@ export async function createJWT(req: Request, res: Response, next: NextFunction)
   }
 
   res.locals.jwt = jwt;
+}
+
+/**
+ * Validate token in either request or response.
+ * @param req Requires token parameters.
+ * @param res Optional res.locals.jwt to authenticate. If successful, res.locals.mac will be set. Else, res.locals.error will contain reason. 
+ */
+export async function validateJWT(req: Request, res: Response, next: NextFunction): Promise<void> {
+  const token = req.params.token || res.locals.jwt;
+  if (!token) {
+    res.locals.error = 'Unset token parameter or res.locals.jwt';
+    return next();
+  }
+
+  const mac = await verify(token);
+  if (!mac) {
+    res.locals.error = 'Invalid JWT.';
+    return next();
+  }
+
+  res.locals.mac = mac;
 }

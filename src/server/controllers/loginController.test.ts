@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 
 import * as deviceModel from './../models/devices';
-import { createJWT } from './loginController';
-import { getPasshash, verify } from './../utils/authenticate';
+import { createJWT, validateJWT } from './loginController';
+import { getPasshash, verify, getJWT } from './../utils/authenticate';
 
 
-describe('Test register controller', () => {
+describe('Test login controller', () => {
   const mac = '00:1A:C2:7B:00:47';
   const password = 'test-password';
 
@@ -16,7 +16,7 @@ describe('Test register controller', () => {
   beforeEach(async () => {
     await deviceModel.clearDatabase();
 
-    mockRequest = { params: { mac, password } };
+    mockRequest = { params: {} };
     mockResponse = {
       locals: {},
     };
@@ -27,6 +27,8 @@ describe('Test register controller', () => {
   });
 
   test('Login to device', async () => {
+    mockRequest = { params: { mac, password } };
+
     await deviceModel.createDevice(mac, await getPasshash(password), { pollFrequency: 1000 }, []);
 
     await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
@@ -49,5 +51,46 @@ describe('Test register controller', () => {
     await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');
+  });
+
+  test('Validate token', async () => {
+    let token: string = await getJWT(mac) as string;
+    mockRequest = { params: { token } };
+
+    await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
+
+    expect(mockResponse.locals).toHaveProperty('mac');
+    expect(mockResponse.locals?.mac).toBe(mac);
+
+    // different token
+    token = await getJWT('11:1A:C2:7B:27:1A') as string;
+    mockRequest = { params: { token } };
+    mockResponse = {
+      locals: {},
+    };
+
+    await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
+
+    expect(mockResponse.locals?.mac).not.toBe(mac);
+
+    // invalid token
+    mockRequest = { params: { token: 'NotAValidToken' } };
+    mockResponse = {
+      locals: {},
+    };
+
+    await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
+
+    expect(mockResponse.locals).not.toHaveProperty('mac');
+
+    // unset token
+    mockRequest = { params: {} };
+    mockResponse = {
+      locals: {},
+    };
+
+    await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
+
+    expect(mockResponse.locals).not.toHaveProperty('mac');
   });
 });

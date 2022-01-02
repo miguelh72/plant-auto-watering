@@ -13,16 +13,25 @@ import { validateMAC } from './../../shared/validate';
  */
 export async function createJWT(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { mac, password } = req.params;
-  if (!mac || !password || !validateMAC(mac)) return next();
+  if (!mac || !password || !validateMAC(mac)) {
+    res.locals.error = 'Invalid MAC or unset password.';
+    return next();
+  }
 
   const passhash = await getPasshash(password);
 
   const shallowDevice: ShallowDevice | null = await deviceModel.readShallowDevice(mac);
   const isValidPassword = shallowDevice && await bcrypt.compare(password, shallowDevice.passhash);
-  if (!shallowDevice || !isValidPassword) return next();
+  if (!shallowDevice || !isValidPassword) {
+    res.locals.error = 'Device does not exist or invalid password.';
+    return next();
+  }
 
   const jwt = await getJWT(mac);
-  if (!jwt) return next();
+  if (!jwt) {
+    res.locals.error = 'Failed to create JWT.';
+    return next();
+  }
 
   res.locals.jwt = jwt;
 }

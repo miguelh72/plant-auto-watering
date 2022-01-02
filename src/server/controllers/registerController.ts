@@ -13,16 +13,23 @@ const defaultPollFrequency = 1000; // ms
  */
 export async function createDevice(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { mac, password } = req.params;
-  if (!mac || !password || !validateMAC(mac)) return next();
+  if (!mac || !password || !validateMAC(mac)) {
+    res.locals.error = 'Invalid MAC or unset password.';
+    return next();
+  }
 
   const passhash = await getPasshash(password);
 
   const createdDevice = await deviceModel.createDevice(mac, passhash, { pollFrequency: defaultPollFrequency }, []);
-  if (!createdDevice) return next();
+  if (!createdDevice) {
+    res.locals.error = 'Failed to create device.';
+    return next();
+  }
 
   const jwt = await getJWT(mac);
   if (!jwt) {
     await deviceModel.removeDevice(mac);
+    res.locals.error = 'Failed to create JWT.';
     return next();
   }
 

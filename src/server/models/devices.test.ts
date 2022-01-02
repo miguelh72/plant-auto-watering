@@ -31,6 +31,10 @@ describe('CRUD operations on device model', () => {
     await deviceModel.clearDatabase();
   });
 
+  afterAll(async () => {
+    await deviceModel.clearDatabase();
+  });
+
   test('Create new device', async () => {
     expect(await deviceModel.createDevice(mac1, passhash1, settings1, state1)).toBe(true);
 

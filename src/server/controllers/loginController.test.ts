@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 
 import * as deviceModel from './../models/devices';
-import { createDevice } from './registerController';
-import { verify } from './../utils/authenticate';
+import { createJWT } from './loginController';
+import { getPasshash, verify } from './../utils/authenticate';
 
 
 describe('Test register controller', () => {
@@ -26,23 +26,27 @@ describe('Test register controller', () => {
     await deviceModel.clearDatabase();
   });
 
-  test('Create new device', async () => {
-    await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
+  test('Login to device', async () => {
+    await deviceModel.createDevice(mac, await getPasshash(password), { pollFrequency: 1000 }, []);
+
+    await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).toHaveProperty('jwt');
+    expect(typeof mockResponse.locals?.jwt).toBe('string');
     expect(await verify(mockResponse.locals?.jwt)).toBe(mac);
 
-    // try to create a duplicate device
+    // invalid mac
     mockResponse = {
       locals: {},
     };
-    await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
+    mockRequest = { params: { mac: 'Not:valid', password } };
+    await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');
 
-    // try to create an entry with invalid mac
-    mockRequest = { params: { mac: 'Not:Mac', password } };
-    await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
+    // invalid password
+    mockRequest = { params: { mac, password: 'wrongPass' } };
+    await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');
   });

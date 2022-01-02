@@ -352,3 +352,4 @@ MigrationBackup/
 # CUSTOM
 dist
 coverage
+package-lock.json

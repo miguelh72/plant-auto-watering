@@ -41,3 +41,7 @@ export type Device = ShallowDevice & {
   settings: Settings;
   states: State[];
 };
+
+export type JWTPayload = {
+  mac: string;
+};

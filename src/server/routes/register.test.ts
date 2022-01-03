@@ -18,7 +18,7 @@ describe('API testing registration endpoints', () => {
 
   test('Register a new device', async () => {
     return supertest(app)
-      .post('/register')
+      .post('/api/register')
       .send({ mac, password })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
@@ -32,7 +32,7 @@ describe('API testing registration endpoints', () => {
 
   test('Register a new device with invalid MAC', async () => {
     return supertest(app)
-      .post('/register')
+      .post('/api/register')
       .send({ mac: "Not:Valid", password })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
@@ -49,7 +49,7 @@ describe('API testing registration endpoints', () => {
     const token = await getJWT(mac);
 
     return supertest(app)
-      .delete('/register')
+      .delete('/api/register')
       .send({ token })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
@@ -66,7 +66,7 @@ describe('API testing registration endpoints', () => {
     const invalidToken = 'This is not a valid token';
 
     return supertest(app)
-      .delete('/register')
+      .delete('/api/register')
       .send({ token: invalidToken })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
@@ -83,7 +83,7 @@ describe('API testing registration endpoints', () => {
     const invalidToken = await getJWT('11:1A:C2:7B:22:33');
 
     return supertest(app)
-      .delete('/register')
+      .delete('/api/register')
       .send({ token: invalidToken })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')

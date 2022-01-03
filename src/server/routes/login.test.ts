@@ -19,7 +19,7 @@ describe('API testing login endpoint', () => {
 
   test('Authenticate a client', async () => {
     return supertest(app)
-      .post('/login')
+      .post('/api/authenticate')
       .send({ mac, password })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
@@ -32,7 +32,7 @@ describe('API testing login endpoint', () => {
 
   test('Attempt to authenticate a client with invalid MAC', async () => {
     return supertest(app)
-      .post('/login')
+      .post('/api/authenticate')
       .send({ mac: "Not:Valid", password })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
@@ -45,7 +45,7 @@ describe('API testing login endpoint', () => {
 
   test('Attempt to authenticate to a device that doesn\'t exist', async () => {
     return supertest(app)
-      .post('/login')
+      .post('/api/authenticate')
       .send({ mac: '11:1A:C2:7B:22:33', password })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')

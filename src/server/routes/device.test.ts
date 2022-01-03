@@ -182,4 +182,60 @@ describe('API testing device endpoints', () => {
         });
     });
   });
+
+  describe('Patch settings', () => {
+    const newSettings: Settings = { pollFrequency: 499 };
+
+    test('Update device settings', async () => {
+      return supertest(app)
+        .patch('/api/device/settings')
+        .send({ token, settings: newSettings })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(200)
+        .then(async result => {
+          expect(result.body).toHaveProperty('message');
+
+          const deviceSettings: Settings = await deviceModel.readSettings(mac) as Settings;
+          expect(deviceSettings).toEqual(newSettings);
+        });
+    });
+
+    test('Attempt to update device settings with invalid token', async () => {
+      const invalidToken = 'invalidToken';
+
+      return supertest(app)
+        .patch('/api/device/settings')
+        .send({ token: invalidToken, settings: newSettings })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(400)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+
+          const deviceSettings: Settings = await deviceModel.readSettings(mac) as Settings;
+          expect(deviceSettings).toEqual(settings);
+        });
+    });
+
+    test('Attempt to update device settings for device that doesn\'t exist', async () => {
+      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+
+      return supertest(app)
+        .patch('/api/device/settings')
+        .send({ token: invalidToken, settings: newSettings })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(500)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+
+          const deviceSettings: Settings = await deviceModel.readSettings(mac) as Settings;
+          expect(deviceSettings).toEqual(settings);
+        });
+    });
+  });
 });

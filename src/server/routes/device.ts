@@ -22,6 +22,23 @@ router.get('/settings',
   }
 );
 
+router.patch('/settings',
+  loginController.validateJWT,
+  deviceController.updateSettings,
+  (req: Request, res: Response) => {
+    if (!res.locals.mac) {
+      console.log(res.locals.error);
+      return res.status(400).json({ error: 'Failed to authenticate.' });
+    }
+    if (res.locals.error || !res.locals.successful) {
+      console.log(res.locals.error);
+      return res.status(500).json({ error: 'Failed to update device settings.' });
+    }
+
+    res.json({ message: 'Device settings updated successfully.' });
+  }
+);
+
 router.get('/states',
   loginController.validateJWT,
   deviceController.getStates,

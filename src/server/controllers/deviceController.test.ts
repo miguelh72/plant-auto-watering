@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 import * as deviceModel from '../models/devices';
 import { getPasshash } from '../utils/authenticate';
-import { updatePassword, getSettings } from './deviceController';
+import { updatePassword, getSettings, getStates } from './deviceController';
 import { ShallowDevice, State, Settings } from '../../shared/types';
 
 
@@ -11,7 +11,7 @@ describe('Test device controller', () => {
   const mac = '00:1A:C2:7B:00:47';
   const password = 'test-password';
   const settings: Settings = { pollFrequency: 1000 };
-  const state: State[] = [
+  const states: State[] = [
     {
       sensor: {
         pin: 7,
@@ -33,7 +33,7 @@ describe('Test device controller', () => {
 
   beforeEach(async () => {
     await deviceModel.clearDatabase();
-    await deviceModel.createDevice(mac, await getPasshash(password), settings, state);
+    await deviceModel.createDevice(mac, await getPasshash(password), settings, states);
 
     mockRequest = { params: {} };
     mockResponse = {
@@ -68,6 +68,31 @@ describe('Test device controller', () => {
 
     await getSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals).not.toHaveProperty('settings');
+  });
+
+  test('Get states for a device', async () => {
+    mockResponse = {
+      locals: { mac },
+    };
+
+    await getStates(mockRequest as Request, mockResponse as Response, nextFunction);
+    expect(mockResponse.locals?.states).toMatchObject(states);
+
+    // Attempt to get settings for device that doesn't exist should fail
+    mockResponse = {
+      locals: { mac: '11:1A:C2:7B:1A:47' },
+    };
+
+    await getStates(mockRequest as Request, mockResponse as Response, nextFunction);
+    expect(mockResponse.locals).not.toHaveProperty('states');
+
+    // Attempt to get settings without res.locals.mac should fail
+    mockResponse = {
+      locals: {},
+    };
+
+    await getStates(mockRequest as Request, mockResponse as Response, nextFunction);
+    expect(mockResponse.locals).not.toHaveProperty('states');
   });
 
   test('Update password', async () => {

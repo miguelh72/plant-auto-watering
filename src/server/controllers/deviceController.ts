@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import * as deviceModel from './../models/devices';
 import { getPasshash } from './../utils/authenticate';
+import { Settings, State } from './../../shared/types';
 
 /**
  * Retrieve settings for a device.
@@ -16,9 +17,7 @@ export async function getSettings(req: Request, res: Response, next: NextFunctio
     return next();
   }
 
-  const settings = await deviceModel.readSettings(res.locals.mac);
-
-  console.log({ settings }); // ! remove
+  const settings: Settings | null = await deviceModel.readSettings(res.locals.mac);
 
   if (!settings) {
     res.locals.error = 'Failed to read settings';
@@ -26,6 +25,29 @@ export async function getSettings(req: Request, res: Response, next: NextFunctio
   }
 
   res.locals.settings = settings;
+}
+
+/**
+ * Retrieve states for a device.
+ * @param req Requires res.locals.mac to be set.
+ * @param res If successful, res.locals.states will be set. Else, res.locals.error will contain reason.
+ */
+export async function getStates(req: Request, res: Response, next: NextFunction): Promise<void> {
+  // TODO check cache 
+
+  if (!res.locals.mac) {
+    res.locals.error = 'res.locals.mac is not set.';
+    return next();
+  }
+
+  const states: State[] | null = await deviceModel.readStates(res.locals.mac);
+
+  if (!states) {
+    res.locals.error = 'Failed to read states';
+    return next();
+  }
+
+  res.locals.states = states;
 }
 
 /**

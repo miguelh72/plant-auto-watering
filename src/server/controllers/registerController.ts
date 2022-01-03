@@ -35,3 +35,23 @@ export async function createDevice(req: Request, res: Response, next: NextFuncti
 
   res.locals.jwt = jwt;
 }
+
+/**
+ * Remove a device.
+ * @param req Requires res.locals.mac to be set.
+ * @param res If successful, res.locals.successful will be set to true. Else, res.locals.error will contain reason.
+ */
+export async function removeDevice(req: Request, res: Response, next: NextFunction): Promise<void> {
+  if (!res.locals.mac) {
+    res.locals.error = 'res.locals.mac is not set.';
+    return next();
+  }
+
+  const deviceRemoved = await deviceModel.removeDevice(res.locals.mac);
+  if (!deviceRemoved) {
+    res.locals.error = 'Unable to remove device.';
+    return next();
+  }
+
+  res.locals.successful = true;
+}

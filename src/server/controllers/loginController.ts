@@ -18,8 +18,6 @@ export async function createJWT(req: Request, res: Response, next: NextFunction)
     return next();
   }
 
-  const passhash = await getPasshash(password);
-
   const shallowDevice: ShallowDevice | null = await deviceModel.readShallowDevice(mac);
   const isValidPassword = shallowDevice && await bcrypt.compare(password, shallowDevice.passhash);
   if (!shallowDevice || !isValidPassword) {
@@ -49,7 +47,7 @@ export async function validateJWT(req: Request, res: Response, next: NextFunctio
   }
 
   const mac = await verify(token);
-  if (!mac) {
+  if (!mac || !validateMAC(mac)) {
     res.locals.error = 'Invalid JWT.';
     return next();
   }

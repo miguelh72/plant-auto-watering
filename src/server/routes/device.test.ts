@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import app from '../index';
 import * as deviceModel from '../models/devices';
 import { getPasshash, getJWT } from '../utils/authenticate';
-import { Settings, State, ShallowDevice } from './../../shared/types';
+import { Settings, State, ShallowDevice, ClientState, DeviceState } from './../../shared/types';
 
 describe('API testing device endpoints', () => {
   const mac = '00:1A:C2:7B:00:47';
@@ -226,6 +226,141 @@ describe('API testing device endpoints', () => {
       return supertest(app)
         .patch('/api/device/settings')
         .send({ token: invalidToken, settings: newSettings })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(500)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+
+          const deviceSettings: Settings = await deviceModel.readSettings(mac) as Settings;
+          expect(deviceSettings).toEqual(settings);
+        });
+    });
+  });
+
+  describe('Patch client states', () => {
+    const newClientStates: ClientState[] = [
+      {
+        sensor: {
+          pin: 7,
+          threshold: 99,
+        },
+        pump: {
+          pin: 5,
+          speed: 145,
+        }
+      }
+    ];
+
+    test('Update device client states', async () => {
+      return supertest(app)
+        .patch('/api/device/states/client')
+        .send({ token, states: newClientStates })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(200)
+        .then(async result => {
+          expect(result.body).toHaveProperty('message');
+
+          const states: State[] = await deviceModel.readStates(mac) as State[];
+          expect(states).toMatchObject(newClientStates);
+        });
+    });
+
+    test('Attempt to update client states with invalid token', async () => {
+      const invalidToken = 'invalidToken';
+
+      return supertest(app)
+        .patch('/api/device/states/client')
+        .send({ token: invalidToken, states: newClientStates })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(400)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+
+          const deviceSettings: Settings = await deviceModel.readSettings(mac) as Settings;
+          expect(deviceSettings).toEqual(settings);
+        });
+    });
+
+    test('Attempt to update client states for device that doesn\'t exist', async () => {
+      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+
+      return supertest(app)
+        .patch('/api/device/states/client')
+        .send({ token: invalidToken, states: newClientStates })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(500)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+
+          const deviceSettings: Settings = await deviceModel.readSettings(mac) as Settings;
+          expect(deviceSettings).toEqual(settings);
+        });
+    });
+  });
+
+  describe('Patch device states', () => {
+    const newDeviceStates: DeviceState[] = [
+      {
+        sensor: {
+          pin: 7,
+          level: 33,
+        },
+        pump: {
+          pin: 5,
+          isActive: true,
+          thresholdOffset: 59,
+        }
+      }
+    ];
+
+    test('Update device device states', async () => {
+      return supertest(app)
+        .patch('/api/device/states/device')
+        .send({ token, states: newDeviceStates })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(200)
+        .then(async result => {
+          expect(result.body).toHaveProperty('message');
+
+          const states: State[] = await deviceModel.readStates(mac) as State[];
+          expect(states).toMatchObject(newDeviceStates);
+        });
+    });
+
+    test('Attempt to update device states with invalid token', async () => {
+      const invalidToken = 'invalidToken';
+
+      return supertest(app)
+        .patch('/api/device/states/device')
+        .send({ token: invalidToken, states: newDeviceStates })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(400)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+
+          const deviceSettings: Settings = await deviceModel.readSettings(mac) as Settings;
+          expect(deviceSettings).toEqual(settings);
+        });
+    });
+
+    test('Attempt to update device states for device that doesn\'t exist', async () => {
+      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+
+      return supertest(app)
+        .patch('/api/device/states/device')
+        .send({ token: invalidToken, states: newDeviceStates })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
         .expect('Content-Type', /application\/json/)

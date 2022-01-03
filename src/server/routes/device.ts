@@ -56,6 +56,40 @@ router.get('/states',
   }
 );
 
+router.patch('/states/client',
+  loginController.validateJWT,
+  deviceController.updateClientStates,
+  (req: Request, res: Response) => {
+    if (!res.locals.mac) {
+      console.log(res.locals.error);
+      return res.status(400).json({ error: 'Failed to authenticate.' });
+    }
+    if (res.locals.error || !res.locals.successful) {
+      console.log(res.locals.error);
+      return res.status(500).json({ error: 'Failed to update client state.' });
+    }
+
+    res.json({ message: 'Device state updated successfully.' });
+  }
+);
+
+router.patch('/states/device',
+  loginController.validateJWT,
+  deviceController.updateDeviceStates,
+  (req: Request, res: Response) => {
+    if (!res.locals.mac) {
+      console.log(res.locals.error);
+      return res.status(400).json({ error: 'Failed to authenticate.' });
+    }
+    if (res.locals.error || !res.locals.successful) {
+      console.log(res.locals.error);
+      return res.status(500).json({ error: 'Failed to update device state.' });
+    }
+
+    res.json({ message: 'Device state updated successfully.' });
+  }
+);
+
 router.patch('/password',
   loginController.validateJWT,
   deviceController.updatePassword,

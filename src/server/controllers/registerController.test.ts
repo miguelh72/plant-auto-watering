@@ -16,7 +16,7 @@ describe('Test register controller', () => {
   beforeEach(async () => {
     await deviceModel.clearDatabase();
 
-    mockRequest = { params: {} };
+    mockRequest = { body: {} };
     mockResponse = {
       locals: {},
     };
@@ -27,7 +27,7 @@ describe('Test register controller', () => {
   });
 
   test('Create new device', async () => {
-    mockRequest = { params: { mac, password } };
+    mockRequest = { body: { mac, password } };
     await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).toHaveProperty('jwt');
@@ -42,7 +42,7 @@ describe('Test register controller', () => {
     expect(mockResponse.locals).not.toHaveProperty('jwt');
 
     // try to create an entry with invalid mac
-    mockRequest = { params: { mac: 'Not:Mac', password } };
+    mockRequest = { body: { mac: 'Not:Mac', password } };
     await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');

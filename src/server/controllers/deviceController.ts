@@ -52,13 +52,13 @@ export async function getStates(req: Request, res: Response, next: NextFunction)
 
 /**
  * Update password for device.
- * @param req Requires password parameter and res.locals.mac to be set.
+ * @param req Requires password body parameter and res.locals.mac to be set.
  * @param res If successful, res.locals.successful will be set to true. Else, res.locals.error will contain reason.
  */
 export async function updatePassword(req: Request, res: Response, next: NextFunction) {
   // TODO validate password
 
-  const password: string | undefined = req.params.password;
+  const password: string | undefined = req.body.password;
   if (!password || !res.locals.mac) {
     res.locals.error = 'Password parameter or res.locals.mac are not set.';
     return next();

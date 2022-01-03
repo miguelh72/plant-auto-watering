@@ -8,13 +8,13 @@ const defaultPollFrequency = 1000; // ms
 
 /**
  * Create a device.
- * @param req Requires mac and password parameters.
+ * @param req Requires mac and password body parameters.
  * @param res If successful, res.locals.jwt will be set. Else, res.locals.error will contain reason.
  */
 export async function createDevice(req: Request, res: Response, next: NextFunction): Promise<void> {
   // TODO validate password
 
-  const { mac, password } = req.params;
+  const { mac, password } = req.body;
   if (!mac || !password || !validateMAC(mac)) {
     res.locals.error = 'Invalid MAC or unset password.';
     return next();

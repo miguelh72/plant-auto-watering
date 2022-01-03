@@ -16,7 +16,7 @@ describe('Test login controller', () => {
   beforeEach(async () => {
     await deviceModel.clearDatabase();
 
-    mockRequest = { params: {} };
+    mockRequest = { body: {} };
     mockResponse = {
       locals: {},
     };
@@ -27,7 +27,7 @@ describe('Test login controller', () => {
   });
 
   test('Login to device', async () => {
-    mockRequest = { params: { mac, password } };
+    mockRequest = { body: { mac, password } };
 
     await deviceModel.createDevice(mac, await getPasshash(password), { pollFrequency: 1000 }, []);
 
@@ -41,13 +41,13 @@ describe('Test login controller', () => {
     mockResponse = {
       locals: {},
     };
-    mockRequest = { params: { mac: 'Not:valid', password } };
+    mockRequest = { body: { mac: 'Not:valid', password } };
     await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');
 
     // invalid password
-    mockRequest = { params: { mac, password: 'wrongPass' } };
+    mockRequest = { body: { mac, password: 'wrongPass' } };
     await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');
@@ -55,7 +55,7 @@ describe('Test login controller', () => {
 
   test('Validate token', async () => {
     let token: string = await getJWT(mac) as string;
-    mockRequest = { params: { token } };
+    mockRequest = { body: { token } };
 
     await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
@@ -64,7 +64,7 @@ describe('Test login controller', () => {
 
     // different token
     token = await getJWT('11:1A:C2:7B:27:1A') as string;
-    mockRequest = { params: { token } };
+    mockRequest = { body: { token } };
     mockResponse = {
       locals: {},
     };
@@ -74,7 +74,7 @@ describe('Test login controller', () => {
     expect(mockResponse.locals?.mac).not.toBe(mac);
 
     // invalid token
-    mockRequest = { params: { token: 'NotAValidToken' } };
+    mockRequest = { body: { token: 'NotAValidToken' } };
     mockResponse = {
       locals: {},
     };
@@ -84,7 +84,7 @@ describe('Test login controller', () => {
     expect(mockResponse.locals).not.toHaveProperty('mac');
 
     // unset token
-    mockRequest = { params: {} };
+    mockRequest = { body: {} };
     mockResponse = {
       locals: {},
     };

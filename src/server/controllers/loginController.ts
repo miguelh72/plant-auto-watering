@@ -8,11 +8,11 @@ import { validateMAC } from './../../shared/validate';
 
 /**
  * Create a jwt.
- * @param req Requires mac and password parameters.
+ * @param req Requires mac and password body parameters.
  * @param res If successful, res.locals.jwt will be set. Else, res.locals.error will contain reason. 
  */
 export async function createJWT(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const { mac, password } = req.params;
+  const { mac, password } = req.body;
   if (!mac || !password || !validateMAC(mac)) {
     res.locals.error = 'Invalid MAC or unset password.';
     return next();
@@ -36,11 +36,11 @@ export async function createJWT(req: Request, res: Response, next: NextFunction)
 
 /**
  * Validate token in either request or response.
- * @param req Requires token parameters.
+ * @param req Requires token body parameters.
  * @param res Optional res.locals.jwt to authenticate. If successful, res.locals.mac will be set. Else, res.locals.error will contain reason. 
  */
 export async function validateJWT(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const token = req.params.token || res.locals.jwt;
+  const token = req.body.token || res.locals.jwt;
   if (!token) {
     res.locals.error = 'Unset token parameter or res.locals.jwt';
     return next();

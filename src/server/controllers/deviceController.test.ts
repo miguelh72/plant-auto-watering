@@ -35,7 +35,7 @@ describe('Test device controller', () => {
     await deviceModel.clearDatabase();
     await deviceModel.createDevice(mac, await getPasshash(password), settings, states);
 
-    mockRequest = { params: {} };
+    mockRequest = { body: {} };
     mockResponse = {
       locals: {},
     };
@@ -97,7 +97,7 @@ describe('Test device controller', () => {
 
   test('Update password', async () => {
     const newPassword: string = 'newPassword';
-    mockRequest = { params: { password: newPassword } };
+    mockRequest = { body: { password: newPassword } };
     mockResponse = {
       locals: { mac },
     };
@@ -117,7 +117,7 @@ describe('Test device controller', () => {
     expect(mockResponse.locals?.successful).toBeFalsy();
 
     // Attempt to update without a new password should fail
-    mockRequest = { params: {} };
+    mockRequest = { body: {} };
     mockResponse = {
       locals: { mac },
     };
@@ -126,7 +126,7 @@ describe('Test device controller', () => {
     expect(mockResponse.locals?.successful).toBeFalsy();
 
     // Attempt to update password for a device that doest not exist should fail
-    mockRequest = { params: { password: newPassword } };
+    mockRequest = { body: { password: newPassword } };
     mockResponse = {
       locals: { mac: '11:1A:C2:7B:1A:47' },
     };

@@ -22,4 +22,21 @@ router.get('/settings',
   }
 );
 
+router.get('/states',
+  loginController.validateJWT,
+  deviceController.getStates,
+  (req: Request, res: Response) => {
+    if (!res.locals.mac) {
+      console.log(res.locals.error);
+      return res.status(400).json({ error: 'Failed to authenticate.' });
+    }
+    if (res.locals.error || !res.locals.states) {
+      console.log(res.locals.error);
+      return res.status(500).json({ error: 'Failed to retrieve device states.' });
+    }
+
+    res.json({ states: res.locals.states });
+  }
+);
+
 export default router;

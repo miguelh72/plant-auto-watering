@@ -78,4 +78,47 @@ describe('API testing device endpoints', () => {
         expect(result.body).toHaveProperty('error');
       });
   });
+
+  test('Fetch states for a device', async () => {
+    return supertest(app)
+      .get('/api/device/states')
+      .send({ token })
+      .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
+      .expect('Content-Type', /application\/json/)
+      .expect(200)
+      .then(async result => {
+        expect(result.body.states).toMatchObject(states);
+      });
+  });
+
+  test('Fetch states with invalid token', async () => {
+    const invalidToken = 'invalidToken';
+
+    return supertest(app)
+      .get('/api/device/states')
+      .send({ token: invalidToken })
+      .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
+      .expect('Content-Type', /application\/json/)
+      .expect(400)
+      .then(async result => {
+        expect(result.body).toHaveProperty('error');
+      });
+  });
+
+  test('Fetch states for a device that doesn\'t exist', async () => {
+    const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+
+    return supertest(app)
+      .get('/api/device/states')
+      .send({ token: invalidToken })
+      .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
+      .expect('Content-Type', /application\/json/)
+      .expect(500)
+      .then(async result => {
+        expect(result.body).toHaveProperty('error');
+      });
+  });
 });

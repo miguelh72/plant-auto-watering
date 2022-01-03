@@ -81,7 +81,6 @@ describe('CRUD operations on device model', () => {
     expect(await deviceModel.updateSettings(mac1, settings2)).toBe(true);
     expect(await deviceModel.readSettings(mac1)).toMatchObject(settings2);
 
-    // client state
     const clientState: ClientState[] = [
       {
         sensor: {
@@ -98,7 +97,6 @@ describe('CRUD operations on device model', () => {
     expect(await deviceModel.updateClientStates(mac1, clientState)).toBe(true);
     expect(await deviceModel.readStates(mac1)).toMatchObject(clientState);
 
-    // device state
     const deviceState: DeviceState[] = [
       {
         sensor: {

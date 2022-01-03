@@ -5,11 +5,15 @@ import { Settings, State, Device, ShallowDevice, ClientState, DeviceState } from
 
 let devices: Device[] = [];
 
+function deepCopy<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
 export async function createDevice(mac: string, passhash: string, settings: Settings, states: State[]): Promise<boolean> {
   const deviceAlreadyExists = devices.some(device => device.mac === mac);
   if (deviceAlreadyExists) return false;
 
-  devices.push({ mac, passhash, settings, states });
+  devices.push({ mac, passhash, settings: deepCopy(settings), states: deepCopy(states) });
 
   return true;
 }
@@ -48,7 +52,7 @@ export async function updateSettings(mac: string, settings: Settings): Promise<b
   const deviceIndex = devices.findIndex(device => device.mac === mac);
   if (deviceIndex === -1) return false;
 
-  devices[deviceIndex].settings = settings;
+  devices[deviceIndex].settings = deepCopy(settings);
 
   return true;
 }

@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 
 import * as deviceModel from './../models/devices';
 import { getPasshash } from './../utils/authenticate';
-import { Settings, State } from './../../shared/types';
-import { validateSettings } from './../../shared/validate';
+import { ClientState, DeviceState, Settings, State } from './../../shared/types';
+import { validateSettings, validateClientStates, validateDeviceStates } from './../../shared/validate';
 
 /**
  * Retrieve settings for a device.
@@ -93,6 +93,52 @@ export async function updateSettings(req: Request, res: Response, next: NextFunc
   const updatedSettings = await deviceModel.updateSettings(res.locals.mac, settings);
   if (!updatedSettings) {
     res.locals.error = 'Failed to update settings.';
+    return next();
+  }
+
+  res.locals.successful = true;
+}
+
+/**
+ * Update client states for device.
+ * @param req Requires states body parameter and res.locals.mac to be set.
+ * @param res If successful, res.locals.successful will be set to true. Else, res.locals.error will contain reason.
+ */
+export async function updateClientStates(req: Request, res: Response, next: NextFunction) {
+  // TODO update cache
+
+  const clientStates: ClientState[] | undefined = req.body.states;
+  if (!clientStates || !res.locals.mac || !validateClientStates(clientStates)) {
+    res.locals.error = 'States body parameter is not set or invalid, or res.locals.mac are not set.';
+    return next();
+  }
+
+  const updatesStates = await deviceModel.updateClientStates(res.locals.mac, clientStates);
+  if (!updatesStates) {
+    res.locals.error = 'Failed to update client states.';
+    return next();
+  }
+
+  res.locals.successful = true;
+}
+
+/**
+ * Update client states for device.
+ * @param req Requires states body parameter and res.locals.mac to be set.
+ * @param res If successful, res.locals.successful will be set to true. Else, res.locals.error will contain reason.
+ */
+export async function updateDeviceStates(req: Request, res: Response, next: NextFunction) {
+  // TODO update cache
+
+  const deviceStates: DeviceState[] | undefined = req.body.states;
+  if (!deviceStates || !res.locals.mac || !validateDeviceStates(deviceStates)) {
+    res.locals.error = 'States body parameter is not set or invalid, or res.locals.mac are not set.';
+    return next();
+  }
+
+  const updatesStates = await deviceModel.updateDeviceStates(res.locals.mac, deviceStates);
+  if (!updatesStates) {
+    res.locals.error = 'Failed to update client states.';
     return next();
   }
 

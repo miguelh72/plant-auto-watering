@@ -11,7 +11,7 @@ describe('Test login controller', () => {
 
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let nextFunction: NextFunction = jest.fn();
+  let nextFunction: NextFunction;
 
   beforeEach(async () => {
     await deviceModel.clearDatabase();
@@ -20,6 +20,7 @@ describe('Test login controller', () => {
     mockResponse = {
       locals: {},
     };
+    nextFunction = jest.fn();
   });
 
   afterAll(async () => {
@@ -36,21 +37,26 @@ describe('Test login controller', () => {
     expect(mockResponse.locals).toHaveProperty('jwt');
     expect(typeof mockResponse.locals?.jwt).toBe('string');
     expect(await verify(mockResponse.locals?.jwt)).toBe(mac);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // invalid mac
     mockResponse = {
       locals: {},
     };
     mockRequest = { body: { mac: 'Not:valid', password } };
+    nextFunction = jest.fn();
     await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // invalid password
     mockRequest = { body: { mac, password: 'wrongPass' } };
+    nextFunction = jest.fn();
     await createJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('jwt');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 
   test('Validate token', async () => {
@@ -61,6 +67,7 @@ describe('Test login controller', () => {
 
     expect(mockResponse.locals).toHaveProperty('mac');
     expect(mockResponse.locals?.mac).toBe(mac);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // different token
     token = await getJWT('11:1A:C2:7B:27:1A') as string;
@@ -68,29 +75,35 @@ describe('Test login controller', () => {
     mockResponse = {
       locals: {},
     };
+    nextFunction = jest.fn();
 
     await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals?.mac).not.toBe(mac);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // invalid token
     mockRequest = { body: { token: 'NotAValidToken' } };
     mockResponse = {
       locals: {},
     };
+    nextFunction = jest.fn();
 
     await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('mac');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // unset token
     mockRequest = { body: {} };
     mockResponse = {
       locals: {},
     };
+    nextFunction = jest.fn();
 
     await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).not.toHaveProperty('mac');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 });

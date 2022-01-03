@@ -13,6 +13,8 @@ import { validateSettings, validateClientStates, validateDeviceStates } from './
 export async function getSettings(req: Request, res: Response, next: NextFunction): Promise<void> {
   // TODO check cache 
 
+  if (res.locals.error) return next();
+
   if (!res.locals.mac) {
     res.locals.error = 'res.locals.mac is not set.';
     return next();
@@ -22,10 +24,11 @@ export async function getSettings(req: Request, res: Response, next: NextFunctio
 
   if (!settings) {
     res.locals.error = 'Failed to read settings';
-    return next();
+  } else {
+    res.locals.settings = settings;
   }
 
-  res.locals.settings = settings;
+  return next();
 }
 
 /**
@@ -36,6 +39,8 @@ export async function getSettings(req: Request, res: Response, next: NextFunctio
 export async function getStates(req: Request, res: Response, next: NextFunction): Promise<void> {
   // TODO check cache 
 
+  if (res.locals.error) return next();
+
   if (!res.locals.mac) {
     res.locals.error = 'res.locals.mac is not set.';
     return next();
@@ -45,10 +50,11 @@ export async function getStates(req: Request, res: Response, next: NextFunction)
 
   if (!states) {
     res.locals.error = 'Failed to read states';
-    return next();
+  } else {
+    res.locals.states = states;
   }
 
-  res.locals.states = states;
+  return next();
 }
 
 /**
@@ -58,6 +64,8 @@ export async function getStates(req: Request, res: Response, next: NextFunction)
  */
 export async function updatePassword(req: Request, res: Response, next: NextFunction) {
   // TODO validate password
+
+  if (res.locals.error) return next();
 
   const password: string | undefined = req.body.password;
   if (!password || !res.locals.mac) {
@@ -70,10 +78,11 @@ export async function updatePassword(req: Request, res: Response, next: NextFunc
   const updatedPassword = await deviceModel.updatePasshash(res.locals.mac, passhash);
   if (!updatedPassword) {
     res.locals.error = 'Failed to update passhash.';
-    return next();
+  } else {
+    res.locals.successful = true;
   }
 
-  res.locals.successful = true;
+  return next();
 }
 
 /**
@@ -84,6 +93,8 @@ export async function updatePassword(req: Request, res: Response, next: NextFunc
 export async function updateSettings(req: Request, res: Response, next: NextFunction) {
   // TODO update cache
 
+  if (res.locals.error) return next();
+
   const settings: Settings | undefined = req.body.settings;
   if (!settings || !res.locals.mac || !validateSettings(settings)) {
     res.locals.error = 'Settings body parameter is not set or invalid, or res.locals.mac are not set.';
@@ -93,10 +104,11 @@ export async function updateSettings(req: Request, res: Response, next: NextFunc
   const updatedSettings = await deviceModel.updateSettings(res.locals.mac, settings);
   if (!updatedSettings) {
     res.locals.error = 'Failed to update settings.';
-    return next();
+  } else {
+    res.locals.successful = true;
   }
 
-  res.locals.successful = true;
+  return next();
 }
 
 /**
@@ -107,6 +119,8 @@ export async function updateSettings(req: Request, res: Response, next: NextFunc
 export async function updateClientStates(req: Request, res: Response, next: NextFunction) {
   // TODO update cache
 
+  if (res.locals.error) return next();
+
   const clientStates: ClientState[] | undefined = req.body.states;
   if (!clientStates || !res.locals.mac || !validateClientStates(clientStates)) {
     res.locals.error = 'States body parameter is not set or invalid, or res.locals.mac are not set.';
@@ -116,10 +130,11 @@ export async function updateClientStates(req: Request, res: Response, next: Next
   const updatesStates = await deviceModel.updateClientStates(res.locals.mac, clientStates);
   if (!updatesStates) {
     res.locals.error = 'Failed to update client states.';
-    return next();
+  } else {
+    res.locals.successful = true;
   }
 
-  res.locals.successful = true;
+  return next();
 }
 
 /**
@@ -130,6 +145,8 @@ export async function updateClientStates(req: Request, res: Response, next: Next
 export async function updateDeviceStates(req: Request, res: Response, next: NextFunction) {
   // TODO update cache
 
+  if (res.locals.error) return next();
+
   const deviceStates: DeviceState[] | undefined = req.body.states;
   if (!deviceStates || !res.locals.mac || !validateDeviceStates(deviceStates)) {
     res.locals.error = 'States body parameter is not set or invalid, or res.locals.mac are not set.';
@@ -139,8 +156,9 @@ export async function updateDeviceStates(req: Request, res: Response, next: Next
   const updatesStates = await deviceModel.updateDeviceStates(res.locals.mac, deviceStates);
   if (!updatesStates) {
     res.locals.error = 'Failed to update client states.';
-    return next();
+  } else {
+    res.locals.successful = true;
   }
 
-  res.locals.successful = true;
+  return next();
 }

@@ -29,7 +29,7 @@ describe('Test device controller', () => {
 
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let nextFunction: NextFunction = jest.fn();
+  let nextFunction: NextFunction;
 
   beforeEach(async () => {
     await deviceModel.clearDatabase();
@@ -37,6 +37,7 @@ describe('Test device controller', () => {
 
     mockRequest = { body: {} };
     mockResponse = { locals: {} };
+    nextFunction = jest.fn();
   });
 
   afterAll(async () => {
@@ -50,20 +51,25 @@ describe('Test device controller', () => {
 
     await getSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.settings).toMatchObject(settings);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to get settings for device that doesn't exist should fail
     mockResponse = {
       locals: { mac: '11:1A:C2:7B:1A:47' },
     };
+    nextFunction = jest.fn();
 
     await getSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals).not.toHaveProperty('settings');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to get settings without res.locals.mac should fail
     mockResponse = { locals: {} };
+    nextFunction = jest.fn();
 
     await getSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals).not.toHaveProperty('settings');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 
   test('Get states for a device', async () => {
@@ -71,20 +77,25 @@ describe('Test device controller', () => {
 
     await getStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.states).toMatchObject(states);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to get settings for device that doesn't exist should fail
     mockResponse = {
       locals: { mac: '11:1A:C2:7B:1A:47' },
     };
+    nextFunction = jest.fn();
 
     await getStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals).not.toHaveProperty('states');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to get settings without res.locals.mac should fail
     mockResponse = { locals: {} };
+    nextFunction = jest.fn();
 
     await getStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals).not.toHaveProperty('states');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 
   test('Update password for a device', async () => {
@@ -94,6 +105,7 @@ describe('Test device controller', () => {
 
     await updatePassword(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBe(true);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     const shallowDevice: ShallowDevice = await deviceModel.readShallowDevice(mac) as ShallowDevice;
     expect(await bcrypt.compare(newPassword, shallowDevice.passhash)).toBeTruthy();
@@ -102,23 +114,29 @@ describe('Test device controller', () => {
     mockResponse = {
       locals: {},
     };
+    nextFunction = jest.fn();
 
     await updatePassword(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update without a new password should fail
     mockRequest = { body: {} };
     mockResponse = { locals: { mac } };
+    nextFunction = jest.fn();
 
     await updatePassword(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update password for a device that doest not exist should fail
     mockRequest = { body: { password: newPassword } };
     mockResponse = { locals: { mac: '11:1A:C2:7B:1A:47' } };
+    nextFunction = jest.fn();
 
     await updatePassword(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 
   test('Update settings for a device', async () => {
@@ -128,36 +146,45 @@ describe('Test device controller', () => {
 
     await updateSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBe(true);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     const retrievedSettings: Settings | null = await deviceModel.readSettings(mac);
     expect(retrievedSettings).toMatchObject(newSettings);
 
     // Attempt to update without setting mac in response should fail
     mockResponse = { locals: {} };
+    nextFunction = jest.fn();
 
     await updateSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update without a new settings should fail
     mockRequest = { body: {} };
     mockResponse = { locals: { mac } };
+    nextFunction = jest.fn();
 
     await updateSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update settings for a device that doest not exist should fail
     mockRequest = { body: { settings: newSettings } };
     mockResponse = { locals: { mac: '11:1A:C2:7B:1A:47' } };
+    nextFunction = jest.fn();
 
     await updateSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update settings with invalid settings object should fail
     mockRequest = { body: { settings: { notValid: true } } };
     mockResponse = { locals: { mac } };
+    nextFunction = jest.fn();
 
     await updateSettings(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 
   test('Update client states for a device', async () => {
@@ -178,6 +205,7 @@ describe('Test device controller', () => {
 
     await updateClientStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBe(true);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     const retrievedStates: State[] | null = await deviceModel.readStates(mac);
 
@@ -186,30 +214,38 @@ describe('Test device controller', () => {
 
     // Attempt to update without setting mac in response should fail
     mockResponse = { locals: {} };
+    nextFunction = jest.fn();
 
     await updateClientStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update without a new client state should fail
     mockRequest = { body: {} };
     mockResponse = { locals: { mac } };
+    nextFunction = jest.fn();
 
     await updateClientStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update client state for a device that doest not exist should fail
     mockRequest = { body: { states: clientState } };
     mockResponse = { locals: { mac: '11:1A:C2:7B:1A:47' } };
+    nextFunction = jest.fn();
 
     await updateClientStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update settings with invalid client state object should fail
     mockRequest = { body: { states: [{ notValid: true }] } };
     mockResponse = { locals: { mac } };
+    nextFunction = jest.fn();
 
     await updateClientStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 
   test('Update device states for a device', async () => {
@@ -239,29 +275,37 @@ describe('Test device controller', () => {
 
     // Attempt to update without setting mac in response should fail
     mockResponse = { locals: {} };
+    nextFunction = jest.fn();
 
     await updateDeviceStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update without a new client state should fail
     mockRequest = { body: {} };
     mockResponse = { locals: { mac } };
+    nextFunction = jest.fn();
 
     await updateDeviceStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update client state for a device that doest not exist should fail
     mockRequest = { body: { states: deviceState } };
     mockResponse = { locals: { mac: '11:1A:C2:7B:1A:47' } };
+    nextFunction = jest.fn();
 
     await updateDeviceStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // Attempt to update settings with invalid client state object should fail
     mockRequest = { body: { states: [{ notValid: true }] } };
     mockResponse = { locals: { mac } };
+    nextFunction = jest.fn();
 
     await updateDeviceStates(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 });

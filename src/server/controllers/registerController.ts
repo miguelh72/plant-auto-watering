@@ -32,10 +32,11 @@ export async function createDevice(req: Request, res: Response, next: NextFuncti
   if (!jwt) {
     await deviceModel.removeDevice(mac);
     res.locals.error = 'Failed to create JWT.';
-    return next();
+  } else {
+    res.locals.jwt = jwt;
   }
 
-  res.locals.jwt = jwt;
+  return next();
 }
 
 /**
@@ -46,6 +47,8 @@ export async function createDevice(req: Request, res: Response, next: NextFuncti
 export async function removeDevice(req: Request, res: Response, next: NextFunction): Promise<void> {
   // TODO remove cache for device
 
+  if (res.locals.error) return next();
+
   if (!res.locals.mac) {
     res.locals.error = 'res.locals.mac is not set.';
     return next();
@@ -54,8 +57,9 @@ export async function removeDevice(req: Request, res: Response, next: NextFuncti
   const deviceRemoved = await deviceModel.removeDevice(res.locals.mac);
   if (!deviceRemoved) {
     res.locals.error = 'Unable to remove device.';
-    return next();
+  } else {
+    res.locals.successful = true;
   }
 
-  res.locals.successful = true;
+  return next();
 }

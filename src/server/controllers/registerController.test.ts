@@ -11,7 +11,7 @@ describe('Test register controller', () => {
 
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
-  let nextFunction: NextFunction = jest.fn();
+  let nextFunction: NextFunction;
 
   beforeEach(async () => {
     await deviceModel.clearDatabase();
@@ -20,6 +20,7 @@ describe('Test register controller', () => {
     mockResponse = {
       locals: {},
     };
+    nextFunction = jest.fn();
   });
 
   afterAll(async () => {
@@ -32,20 +33,25 @@ describe('Test register controller', () => {
 
     expect(mockResponse.locals).toHaveProperty('jwt');
     expect(await verify(mockResponse.locals?.jwt)).toBe(mac);
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // try to create a duplicate device
     mockResponse = {
       locals: {},
     };
-    await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
+    nextFunction = jest.fn();
 
+    await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals).not.toHaveProperty('jwt');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // try to create an entry with invalid mac
     mockRequest = { body: { mac: 'Not:Mac', password } };
-    await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
+    nextFunction = jest.fn();
 
+    await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals).not.toHaveProperty('jwt');
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 
   test('Remove a device', async () => {
@@ -58,21 +64,26 @@ describe('Test register controller', () => {
 
     expect(mockResponse.locals?.successful).toBe(true);
     expect(await deviceModel.readShallowDevice(mac)).toBeNull();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // attempt to remove device that does not exist should fail
     mockResponse = {
       locals: { mac },
     };
-    await removeDevice(mockRequest as Request, mockResponse as Response, nextFunction);
+    nextFunction = jest.fn();
 
+    await removeDevice(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // attempt to remove device without setting res.locals.mac should fail
     mockResponse = {
       locals: {},
     };
-    await removeDevice(mockRequest as Request, mockResponse as Response, nextFunction);
+    nextFunction = jest.fn();
 
+    await removeDevice(mockRequest as Request, mockResponse as Response, nextFunction);
     expect(mockResponse.locals?.successful).toBeFalsy();
+    expect(nextFunction).toHaveBeenCalledTimes(1);
   });
 });

@@ -28,10 +28,11 @@ export async function createJWT(req: Request, res: Response, next: NextFunction)
   const jwt = await getJWT(mac);
   if (!jwt) {
     res.locals.error = 'Failed to create JWT.';
-    return next();
+  } else {
+    res.locals.jwt = jwt;
   }
 
-  res.locals.jwt = jwt;
+  return next();
 }
 
 /**
@@ -49,8 +50,9 @@ export async function validateJWT(req: Request, res: Response, next: NextFunctio
   const mac = await verify(token);
   if (!mac || !validateMAC(mac)) {
     res.locals.error = 'Invalid JWT.';
-    return next();
+  } else {
+    res.locals.mac = mac;
   }
 
-  res.locals.mac = mac;
+  return next();
 }

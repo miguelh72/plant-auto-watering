@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as deviceModel from './../models/devices';
 import { getPasshash } from './../utils/authenticate';
 import { Settings, State } from './../../shared/types';
+import { validateSettings } from './../../shared/validate';
 
 /**
  * Retrieve settings for a device.
@@ -60,7 +61,7 @@ export async function updatePassword(req: Request, res: Response, next: NextFunc
 
   const password: string | undefined = req.body.password;
   if (!password || !res.locals.mac) {
-    res.locals.error = 'Password parameter or res.locals.mac are not set.';
+    res.locals.error = 'Password body parameter or res.locals.mac are not set.';
     return next();
   }
 
@@ -69,6 +70,29 @@ export async function updatePassword(req: Request, res: Response, next: NextFunc
   const updatedPassword = await deviceModel.updatePasshash(res.locals.mac, passhash);
   if (!updatedPassword) {
     res.locals.error = 'Failed to update passhash.';
+    return next();
+  }
+
+  res.locals.successful = true;
+}
+
+/**
+ * Update settings for device.
+ * @param req Requires settings body parameter and res.locals.mac to be set.
+ * @param res If successful, res.locals.successful will be set to true. Else, res.locals.error will contain reason.
+ */
+export async function updateSettings(req: Request, res: Response, next: NextFunction) {
+  // TODO update cache
+
+  const settings: Settings | undefined = req.body.settings;
+  if (!settings || !res.locals.mac || !validateSettings(settings)) {
+    res.locals.error = 'Settings body parameter is not set or invalid, or res.locals.mac are not set.';
+    return next();
+  }
+
+  const updatedSettings = await deviceModel.updateSettings(res.locals.mac, settings);
+  if (!updatedSettings) {
+    res.locals.error = 'Failed to update settings.';
     return next();
   }
 

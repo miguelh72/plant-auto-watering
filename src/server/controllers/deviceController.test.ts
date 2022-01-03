@@ -3,13 +3,29 @@ import * as bcrypt from 'bcrypt';
 
 import * as deviceModel from '../models/devices';
 import { getPasshash } from '../utils/authenticate';
-import { updatePassword } from './deviceController';
-import { ShallowDevice } from '../../shared/types';
+import { updatePassword, getSettings } from './deviceController';
+import { ShallowDevice, State, Settings } from '../../shared/types';
 
 
 describe('Test device controller', () => {
   const mac = '00:1A:C2:7B:00:47';
   const password = 'test-password';
+  const settings: Settings = { pollFrequency: 1000 };
+  const state: State[] = [
+    {
+      sensor: {
+        pin: 7,
+        threshold: 100,
+        level: 50,
+      },
+      pump: {
+        pin: 5,
+        isActive: false,
+        speed: 255,
+        thresholdOffset: 50,
+      }
+    }
+  ];
 
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
@@ -17,6 +33,7 @@ describe('Test device controller', () => {
 
   beforeEach(async () => {
     await deviceModel.clearDatabase();
+    await deviceModel.createDevice(mac, await getPasshash(password), settings, state);
 
     mockRequest = { params: {} };
     mockResponse = {
@@ -28,10 +45,33 @@ describe('Test device controller', () => {
     await deviceModel.clearDatabase();
   });
 
+  test('Get settings for a device', async () => {
+    mockResponse = {
+      locals: { mac },
+    };
+
+    await getSettings(mockRequest as Request, mockResponse as Response, nextFunction);
+    expect(mockResponse.locals?.settings).toMatchObject(settings);
+
+    // Attempt to get settings for device that doesn't exist should fail
+    mockResponse = {
+      locals: { mac: '11:1A:C2:7B:1A:47' },
+    };
+
+    await getSettings(mockRequest as Request, mockResponse as Response, nextFunction);
+    expect(mockResponse.locals).not.toHaveProperty('settings');
+
+    // Attempt to get settings without res.locals.mac should fail
+    mockResponse = {
+      locals: {},
+    };
+
+    await getSettings(mockRequest as Request, mockResponse as Response, nextFunction);
+    expect(mockResponse.locals).not.toHaveProperty('settings');
+  });
+
   test('Update password', async () => {
     const newPassword: string = 'newPassword';
-
-    await deviceModel.createDevice(mac, await getPasshash(password), { pollFrequency: 1000 }, []);
     mockRequest = { params: { password: newPassword } };
     mockResponse = {
       locals: { mac },
@@ -55,6 +95,15 @@ describe('Test device controller', () => {
     mockRequest = { params: {} };
     mockResponse = {
       locals: { mac },
+    };
+
+    await updatePassword(mockRequest as Request, mockResponse as Response, nextFunction);
+    expect(mockResponse.locals?.successful).toBeFalsy();
+
+    // Attempt to update password for a device that doest not exist should fail
+    mockRequest = { params: { password: newPassword } };
+    mockResponse = {
+      locals: { mac: '11:1A:C2:7B:1A:47' },
     };
 
     await updatePassword(mockRequest as Request, mockResponse as Response, nextFunction);

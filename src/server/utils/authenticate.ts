@@ -35,7 +35,7 @@ export async function getPasshash(password: string): Promise<string> {
   return bcrypt.hash(password, saltRounds);
 }
 
-export async function verify(token: string): Promise<string | null> {
+export async function verifyToken(token: string): Promise<string | null> {
   return new Promise(resolve => {
     jwt.verify(token, secret, (err: jwt.VerifyErrors, decoded: Payload) => {
       return resolve(err ? null : decoded.mac);

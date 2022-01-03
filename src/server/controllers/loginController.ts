@@ -3,7 +3,7 @@ import * as bcrypt from 'bcrypt';
 
 import * as deviceModel from './../models/devices';
 import { ShallowDevice } from '../../shared/types';
-import { getPasshash, getJWT, verify } from './../utils/authenticate';
+import { getJWT, verifyToken } from './../utils/authenticate';
 import { validateMAC } from './../../shared/validate';
 
 /**
@@ -47,7 +47,7 @@ export async function validateJWT(req: Request, res: Response, next: NextFunctio
     return next();
   }
 
-  const mac = await verify(token);
+  const mac = await verifyToken(token);
   if (!mac || !validateMAC(mac)) {
     res.locals.error = 'Invalid JWT.';
   } else {

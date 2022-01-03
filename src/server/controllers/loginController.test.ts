@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import * as deviceModel from './../models/devices';
 import { createJWT, validateJWT } from './loginController';
-import { getPasshash, verify, getJWT } from './../utils/authenticate';
+import { getPasshash, verifyToken, getJWT } from './../utils/authenticate';
 
 
 describe('Test login controller', () => {
@@ -36,7 +36,7 @@ describe('Test login controller', () => {
 
     expect(mockResponse.locals).toHaveProperty('jwt');
     expect(typeof mockResponse.locals?.jwt).toBe('string');
-    expect(await verify(mockResponse.locals?.jwt)).toBe(mac);
+    expect(await verifyToken(mockResponse.locals?.jwt)).toBe(mac);
     expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // invalid mac

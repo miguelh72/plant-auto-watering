@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 import * as deviceModel from './../models/devices';
 import { createDevice, removeDevice } from './registerController';
-import { verify, getPasshash, getJWT } from './../utils/authenticate';
+import { verifyToken, getPasshash, getJWT } from './../utils/authenticate';
 
 
 describe('Test register controller', () => {
@@ -32,7 +32,7 @@ describe('Test register controller', () => {
     await createDevice(mockRequest as Request, mockResponse as Response, nextFunction);
 
     expect(mockResponse.locals).toHaveProperty('jwt');
-    expect(await verify(mockResponse.locals?.jwt)).toBe(mac);
+    expect(await verifyToken(mockResponse.locals?.jwt)).toBe(mac);
     expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // try to create a duplicate device

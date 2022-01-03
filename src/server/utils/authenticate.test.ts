@@ -1,5 +1,5 @@
 import * as deviceModel from '../models/devices';
-import { authenticate, verify, getPasshash } from './authenticate';
+import { authenticate, verifyToken, getPasshash } from './authenticate';
 
 describe('Test authentication utility functions', () => {
   const mac1 = '00:1A:C2:7B:00:47';
@@ -35,9 +35,9 @@ describe('Test authentication utility functions', () => {
 
     const token: string = await authenticate(mac1, password) as string;
 
-    expect(await verify(token)).toBe(mac1);
+    expect(await verifyToken(token)).toBe(mac1);
 
     // Invalid jwt
-    expect(await verify(invalidJWT)).toBeNull();
+    expect(await verifyToken(invalidJWT)).toBeNull();
   });
 });

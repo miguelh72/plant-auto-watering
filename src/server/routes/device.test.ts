@@ -1,9 +1,10 @@
 import supertest from 'supertest';
+import bcrypt from 'bcrypt';
 
 import app from '../index';
 import * as deviceModel from '../models/devices';
 import { getPasshash, getJWT } from '../utils/authenticate';
-import { Settings, State } from './../../shared/types';
+import { Settings, State, ShallowDevice } from './../../shared/types';
 
 describe('API testing device endpoints', () => {
   const mac = '00:1A:C2:7B:00:47';
@@ -36,89 +37,149 @@ describe('API testing device endpoints', () => {
     await deviceModel.clearDatabase();
   });
 
-  test('Fetch settings for a device', async () => {
-    return supertest(app)
-      .get('/api/device/settings')
-      .send({ token })
-      .set('Accept', 'application/json')
-      .set('Content-Type', 'application/json')
-      .expect('Content-Type', /application\/json/)
-      .expect(200)
-      .then(async result => {
-        expect(result.body.settings).toMatchObject(settings);
-      });
+  describe('Fetch settings', () => {
+    test('Fetch settings for a device', async () => {
+      return supertest(app)
+        .get('/api/device/settings')
+        .send({ token })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(200)
+        .then(async result => {
+          expect(result.body.settings).toMatchObject(settings);
+        });
+    });
+
+    test('Fetch settings with invalid token', async () => {
+      const invalidToken = 'invalidToken';
+
+      return supertest(app)
+        .get('/api/device/settings')
+        .send({ token: invalidToken })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(400)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+        });
+    });
+
+    test('Fetch settings for a device that doesn\'t exist', async () => {
+      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+
+      return supertest(app)
+        .get('/api/device/settings')
+        .send({ token: invalidToken })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(500)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+        });
+    });
   });
 
-  test('Fetch settings with invalid token', async () => {
-    const invalidToken = 'invalidToken';
+  describe('Fetch states', () => {
+    test('Fetch states for a device', async () => {
+      return supertest(app)
+        .get('/api/device/states')
+        .send({ token })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(200)
+        .then(async result => {
+          expect(result.body.states).toMatchObject(states);
+        });
+    });
 
-    return supertest(app)
-      .get('/api/device/settings')
-      .send({ token: invalidToken })
-      .set('Accept', 'application/json')
-      .set('Content-Type', 'application/json')
-      .expect('Content-Type', /application\/json/)
-      .expect(400)
-      .then(async result => {
-        expect(result.body).toHaveProperty('error');
-      });
+    test('Fetch states with invalid token', async () => {
+      const invalidToken = 'invalidToken';
+
+      return supertest(app)
+        .get('/api/device/states')
+        .send({ token: invalidToken })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(400)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+        });
+    });
+
+    test('Fetch states for a device that doesn\'t exist', async () => {
+      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+
+      return supertest(app)
+        .get('/api/device/states')
+        .send({ token: invalidToken })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(500)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+        });
+    });
   });
 
-  test('Fetch settings for a device that doesn\'t exist', async () => {
-    const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+  describe('Patch password', () => {
+    const newPassword = 'newPassword';
 
-    return supertest(app)
-      .get('/api/device/settings')
-      .send({ token: invalidToken })
-      .set('Accept', 'application/json')
-      .set('Content-Type', 'application/json')
-      .expect('Content-Type', /application\/json/)
-      .expect(500)
-      .then(async result => {
-        expect(result.body).toHaveProperty('error');
-      });
-  });
+    test('Update device password', async () => {
+      return supertest(app)
+        .patch('/api/device/password')
+        .send({ token, password: newPassword })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(200)
+        .then(async result => {
+          expect(result.body).toHaveProperty('message');
 
-  test('Fetch states for a device', async () => {
-    return supertest(app)
-      .get('/api/device/states')
-      .send({ token })
-      .set('Accept', 'application/json')
-      .set('Content-Type', 'application/json')
-      .expect('Content-Type', /application\/json/)
-      .expect(200)
-      .then(async result => {
-        expect(result.body.states).toMatchObject(states);
-      });
-  });
+          const shallowDevice: ShallowDevice = await deviceModel.readShallowDevice(mac) as ShallowDevice;
+          expect(await bcrypt.compare(newPassword, shallowDevice.passhash)).toBeTruthy();
+        });
+    });
 
-  test('Fetch states with invalid token', async () => {
-    const invalidToken = 'invalidToken';
+    test('Attempt to update device password with invalid token', async () => {
+      const invalidToken = 'invalidToken';
 
-    return supertest(app)
-      .get('/api/device/states')
-      .send({ token: invalidToken })
-      .set('Accept', 'application/json')
-      .set('Content-Type', 'application/json')
-      .expect('Content-Type', /application\/json/)
-      .expect(400)
-      .then(async result => {
-        expect(result.body).toHaveProperty('error');
-      });
-  });
+      return supertest(app)
+        .patch('/api/device/password')
+        .send({ token: invalidToken, password: newPassword })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(400)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
 
-  test('Fetch states for a device that doesn\'t exist', async () => {
-    const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+          const shallowDevice: ShallowDevice = await deviceModel.readShallowDevice(mac) as ShallowDevice;
+          expect(await bcrypt.compare(newPassword, shallowDevice.passhash)).toBeFalsy();
+        });
+    });
 
-    return supertest(app)
-      .get('/api/device/states')
-      .send({ token: invalidToken })
-      .set('Accept', 'application/json')
-      .set('Content-Type', 'application/json')
-      .expect('Content-Type', /application\/json/)
-      .expect(500)
-      .then(async result => {
-        expect(result.body).toHaveProperty('error');
-      });
+    test('Attempt to update device password for device that doesn\'t exist', async () => {
+      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+
+      return supertest(app)
+        .patch('/api/device/password')
+        .send({ token: invalidToken, password: newPassword })
+        .set('Accept', 'application/json')
+        .set('Content-Type', 'application/json')
+        .expect('Content-Type', /application\/json/)
+        .expect(500)
+        .then(async result => {
+          expect(result.body).toHaveProperty('error');
+
+          const shallowDevice: ShallowDevice = await deviceModel.readShallowDevice(mac) as ShallowDevice;
+          expect(await bcrypt.compare(newPassword, shallowDevice.passhash)).toBeFalsy();
+        });
+    });
   });
 });

@@ -39,4 +39,21 @@ router.get('/states',
   }
 );
 
+router.patch('/password',
+  loginController.validateJWT,
+  deviceController.updatePassword,
+  (req: Request, res: Response) => {
+    if (!res.locals.mac) {
+      console.log(res.locals.error);
+      return res.status(400).json({ error: 'Failed to authenticate.' });
+    }
+    if (res.locals.error || !res.locals.successful) {
+      console.log(res.locals.error);
+      return res.status(500).json({ error: 'Failed to update device password.' });
+    }
+
+    res.json({ message: 'Password updated successfully.' });
+  }
+);
+
 export default router;

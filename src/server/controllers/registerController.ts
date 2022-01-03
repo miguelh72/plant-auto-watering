@@ -12,6 +12,8 @@ const defaultPollFrequency = 1000; // ms
  * @param res If successful, res.locals.jwt will be set. Else, res.locals.error will contain reason.
  */
 export async function createDevice(req: Request, res: Response, next: NextFunction): Promise<void> {
+  // TODO validate password
+
   const { mac, password } = req.params;
   if (!mac || !password || !validateMAC(mac)) {
     res.locals.error = 'Invalid MAC or unset password.';
@@ -42,6 +44,8 @@ export async function createDevice(req: Request, res: Response, next: NextFuncti
  * @param res If successful, res.locals.successful will be set to true. Else, res.locals.error will contain reason.
  */
 export async function removeDevice(req: Request, res: Response, next: NextFunction): Promise<void> {
+  // TODO remove cache for device
+
   if (!res.locals.mac) {
     res.locals.error = 'res.locals.mac is not set.';
     return next();

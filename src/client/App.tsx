@@ -9,9 +9,9 @@ import { Page, ClientState } from './utils/types';
 import './App.scss';
 
 export default function App() {
-  const [view, setView] = useState(Page.Device);
+  const [view, setView] = useState(Page.Login);
   const [device, setDevice] = useState<ClientState | null>({
-    mac: '00:1A:C2:7B:00:47', token: 'InvalidToken', settings: null, states: [
+    mac: '00:1A:C2:7B:00:47', token: 'InvalidToken', settings: { pollFrequency: 1000 }, states: [
       {
         sensor: {
           pin: 14,

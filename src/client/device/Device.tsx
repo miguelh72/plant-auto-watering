@@ -8,7 +8,7 @@ import './Device.scss';
 import { ClientState } from './../utils/types';
 import SensorPumpPair from './SensorPumpPair';
 
-// TODO make this a setting
+// TODO make this a setting or let user type pin directly, need to research how arduino code names pins
 const SENSOR_PINS: number[] = [14, 15, 16, 17, 18, 19, 20, 21];
 const PUMP_PINS: number[] = [3, 5, 6, 9, 10];
 
@@ -27,6 +27,8 @@ export default function Device({
 
   const availableSensorPins: number[] = SENSOR_PINS.filter(pin => !usedPins.has(pin));
   const availablePumpPins: number[] = PUMP_PINS.filter(pin => !usedPins.has(pin));;
+
+  // TODO add splash screen if device.settings or device.states has not been loaded
 
   return (
     <div id="device">
@@ -58,7 +60,6 @@ export default function Device({
 
         <Stack spacing={1} className='button-controls' sx={{ alignItems: 'center' }}>
           <Button variant="contained" color="error">Logout</Button>
-          <Button variant="outlined" color="error">Delete Device</Button>
         </Stack>
 
       </Stack>

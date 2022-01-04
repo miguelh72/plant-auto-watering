@@ -9,7 +9,7 @@ import { Page } from './utils/types';
 import './App.scss';
 
 export default function App() {
-  const [view, setView] = useState(Page.Login);
+  const [view, setView] = useState(Page.Register);
   const [token, setToken] = useState<string | null>(null);
 
   // Can't access privileged views without a token

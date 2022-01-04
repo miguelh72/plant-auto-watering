@@ -19,6 +19,7 @@ export default function Login({
   setToken: (token: string | null) => void;
 }) {
   const [state, setState] = useState({
+    errorMessage: '',
     mac: '',
     password: '',
     showPassword: false,
@@ -47,6 +48,8 @@ export default function Login({
 
         <Typography variant='h4'>Login To Device</Typography>
 
+        {state.errorMessage.length > 0 && <Typography variant='body1' color='error'>{state.errorMessage}</Typography>}
+
         <TextField
           id="login-mac-input"
           label="Device MAC address"
@@ -56,9 +59,9 @@ export default function Login({
         />
 
         <FormControl variant="outlined">
-          <InputLabel htmlFor="outlined-adornment-password">Password</InputLabel>
+          <InputLabel htmlFor="login-password-input">Password</InputLabel>
           <OutlinedInput
-            id="outlined-adornment-password"
+            id="login-password-input"
             type={state.showPassword ? 'text' : 'password'}
             value={state.password}
             onChange={handleChange('password')}

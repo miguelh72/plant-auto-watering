@@ -16,7 +16,7 @@ import './Login.scss';
 export default function Login({
   setToken,
 }: {
-  setToken: (token: string | null) => void;
+  setToken: (mac: string, token: string) => void;
 }) {
   const [state, setState] = useState({
     errorMessage: '',

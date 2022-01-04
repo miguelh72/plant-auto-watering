@@ -35,7 +35,7 @@ export type State = ClientState & DeviceState;
 
 export type ShallowDevice = {
   mac: string;
-  passhash: string;
+  passhash?: string;
 };
 export type Device = ShallowDevice & {
   settings: Settings;

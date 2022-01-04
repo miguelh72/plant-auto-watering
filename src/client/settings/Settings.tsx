@@ -1,9 +1,11 @@
 import React from 'react';
 
+import { ClientState } from './../utils/types';
+
 export default function Settings({
-  token,
+  device,
 }: {
-  token: string;
+  device: ClientState;
 }) {
   return (
     <h1>Settings</h1>

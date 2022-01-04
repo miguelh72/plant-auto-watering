@@ -16,7 +16,7 @@ import './Register.scss';
 export default function Register({
   setToken,
 }: {
-  setToken: (token: string | null) => void;
+  setToken: (mac: string, token: string) => void;
 }) {
   const [state, setState] = useState({
     errorMessage: '',

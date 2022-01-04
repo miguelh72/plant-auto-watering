@@ -14,8 +14,10 @@ const PUMP_PINS: number[] = [3, 5, 6, 9, 10];
 
 export default function Device({
   device,
+  setDevice,
 }: {
   device: ClientState;
+  setDevice: (device: ClientState | null) => void;
 }) {
   const usedPins: Set<number> = !device.states
     ? new Set<number>()
@@ -59,10 +61,10 @@ export default function Device({
         }
 
         <Stack spacing={1} className='button-controls' sx={{ alignItems: 'center' }}>
-          <Button variant="contained" color="error">Logout</Button>
+          <Button variant="contained" color="error" onClick={() => setDevice(null)}>Logout</Button>
         </Stack>
 
       </Stack>
-    </div>
+    </div >
   );
 }

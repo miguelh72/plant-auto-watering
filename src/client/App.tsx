@@ -24,8 +24,8 @@ export default function App() {
     <div id="app">
       {view === Page.Login && <Login setAuthorization={setAuthorization} setView={setView} />}
       {view === Page.Register && <Register setAuthorization={setAuthorization} setView={setView} />}
-      {view === Page.Device && device && <Device device={device} />}
-      {view === Page.Settings && device && <Settings device={device} />}
+      {view === Page.Device && device && <Device device={device} setDevice={setDevice} />}
+      {view === Page.Settings && device && <Settings device={device} setDevice={setDevice} />}
     </div>
   );
 }

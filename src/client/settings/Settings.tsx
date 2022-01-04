@@ -8,8 +8,10 @@ import { ClientState } from './../utils/types';
 
 export default function Settings({
   device,
+  setDevice,
 }: {
   device: ClientState;
+  setDevice: (device: ClientState | null) => void;
 }) {
   return (
     <div id="device">

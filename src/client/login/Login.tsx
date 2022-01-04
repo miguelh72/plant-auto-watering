@@ -14,6 +14,7 @@ import Typography from '@mui/material/Typography';
 import './Login.scss';
 
 import { Page } from './../utils/types';
+import { validateMAC } from './../../shared/validate';
 
 export default function Login({
   setAuthorization,
@@ -45,6 +46,32 @@ export default function Login({
   function handleMouseDownPassword(event: React.MouseEvent) {
     event.preventDefault();
   };
+
+  // TODO DRY this with same code in register view
+  async function handleLoginSubmit() {
+    if (!validateMAC(state.mac)) {
+      return setState(state => ({ ...state, errorMessage: 'Invalid MAC address format.' }));
+    }
+    if (state.password.length < 3) {
+      // TODO improve password requirements and checking in both client and backend
+      return setState(state => ({ ...state, errorMessage: 'Password must be at least 3 characters long.' }));
+    }
+
+    const response = await fetch('/api/authenticate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ mac: state.mac, password: state.password }),
+    });
+    if (response.status !== 200) {
+      return setState(state => ({ ...state, errorMessage: 'Failed to log into device. Device may not be registered.' }));
+    }
+
+    const { token } = await response.json();
+    setAuthorization(state.mac, token);
+  }
 
   return (
     <div id="login">
@@ -86,7 +113,7 @@ export default function Login({
         </FormControl>
 
         <Stack spacing={1}>
-          <Button variant="contained">Login</Button>
+          <Button variant="contained" onClick={handleLoginSubmit}>Login</Button>
           <Button variant="outlined" onClick={() => setView(Page.Register)}>Register</Button>
         </Stack>
 

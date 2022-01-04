@@ -11,6 +11,8 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
+import './Register.scss';
+
 export default function Register({
   setToken,
 }: {
@@ -45,7 +47,7 @@ export default function Register({
   };
 
   return (
-    <div id="login">
+    <div id="register">
       <Stack spacing={3} sx={{ padding: 4, borderRadius: 4, backgroundColor: '#fff' }}>
 
         <Typography variant='h4'>Register New Device</Typography>

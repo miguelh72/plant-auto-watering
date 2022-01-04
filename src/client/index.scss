@@ -8,3 +8,12 @@ html, body, #root {
 #root {
   background-color: #aaa;
 }
+
+%center-box {
+  height: 100%;
+  
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

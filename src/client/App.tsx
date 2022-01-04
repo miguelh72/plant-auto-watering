@@ -10,35 +10,20 @@ import './App.scss';
 
 export default function App() {
   const [view, setView] = useState<Page>(Page.Login);
-  const [device, setDevice] = useState<ClientState | null>({
-    mac: '00:1A:C2:7B:00:47', token: 'InvalidToken', settings: { pollFrequency: 1000 }, states: [
-      {
-        sensor: {
-          pin: 14,
-          threshold: 100,
-          level: 50,
-        },
-        pump: {
-          pin: 6,
-          isActive: false,
-          speed: 255,
-          thresholdOffset: 50,
-        }
-      }
-    ]
-  }); // ! reset to (null);
+  const [device, setDevice] = useState<ClientState | null>(null);
 
   // Can't access privileged views without a token
   if ((view !== Page.Login && view !== Page.Register) && !device) setView(Page.Login);
 
-  function setToken(mac: string, token: string): void {
+  function setAuthorization(mac: string, token: string): void {
     setDevice({ mac, token, settings: null, states: null });
+    setView(Page.Device);
   }
 
   return (
     <div id="app">
-      {view === Page.Login && <Login setToken={setToken} setView={setView} />}
-      {view === Page.Register && <Register setToken={setToken} setView={setView} />}
+      {view === Page.Login && <Login setAuthorization={setAuthorization} setView={setView} />}
+      {view === Page.Register && <Register setAuthorization={setAuthorization} setView={setView} />}
       {view === Page.Device && device && <Device device={device} />}
       {view === Page.Settings && device && <Settings device={device} />}
     </div>

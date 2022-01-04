@@ -14,12 +14,13 @@ import Typography from '@mui/material/Typography';
 import './Register.scss';
 
 import { Page } from './../utils/types';
+import { validateMAC } from './../../shared/validate';
 
 export default function Register({
-  setToken,
+  setAuthorization,
   setView,
 }: {
-  setToken: (mac: string, token: string) => void;
+  setAuthorization: (mac: string, token: string) => void;
   setView: (view: Page) => void;
 }) {
   const [state, setState] = useState({
@@ -45,10 +46,37 @@ export default function Register({
       }));
     }
   }
-
   function handleMouseDownPassword(event: React.MouseEvent) {
     event.preventDefault();
   };
+
+  async function handleRegisterSubmit() {
+    if (!validateMAC(state.mac)) {
+      return setState(state => ({ ...state, errorMessage: 'Invalid MAC address format.' }));
+    }
+    if (state.password !== state.confirmPassword) {
+      return setState(state => ({ ...state, errorMessage: 'Passwords do not match.' }));
+    }
+    if (state.password.length < 3) {
+      // TODO improve password requirements and checking in both client and backend
+      return setState(state => ({ ...state, errorMessage: 'Password must be at least 3 characters long.' }));
+    }
+
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ mac: state.mac, password: state.password }),
+    });
+    if (response.status !== 200) {
+      return setState(state => ({ ...state, errorMessage: 'Failed to create device. Device may already exist.' }));
+    }
+
+    const { token } = await response.json();
+    setAuthorization(state.mac, token);
+  }
 
   return (
     <div id="register">
@@ -113,7 +141,7 @@ export default function Register({
         </FormControl>
 
         <Stack spacing={1}>
-          <Button variant="contained">Register</Button>
+          <Button variant="contained" onClick={handleRegisterSubmit}>Register</Button>
           <Button variant="outlined" onClick={() => setView(Page.Login)}>Back To Login</Button>
         </Stack>
 

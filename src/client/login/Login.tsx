@@ -16,10 +16,10 @@ import './Login.scss';
 import { Page } from './../utils/types';
 
 export default function Login({
-  setToken,
+  setAuthorization,
   setView,
 }: {
-  setToken: (mac: string, token: string) => void;
+  setAuthorization: (mac: string, token: string) => void;
   setView: (view: Page) => void;
 }) {
   const [state, setState] = useState({

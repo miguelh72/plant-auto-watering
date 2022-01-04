@@ -2,5 +2,8 @@ import React from 'react';
 import ReactDom from 'react-dom';
 
 import 'normalize.css';
+import './index.scss';
 
-ReactDom.render(<h1>Hello World!</h1>, document.getElementById('root'));
+import App from './App';
+
+ReactDom.render(<App />, document.getElementById('root'));

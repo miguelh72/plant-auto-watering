@@ -10,7 +10,7 @@ router.post('/',
   (req: Request, res: Response) => {
     if (res.locals.error || !res.locals.jwt) {
       console.log(res.locals.error);
-      return res.status(400).json({ error: 'Failed to create device.' });
+      return res.status(400).json({ error: 'Failed to create device. Device may already exist.' });
     }
 
     res.json({ token: res.locals.jwt })

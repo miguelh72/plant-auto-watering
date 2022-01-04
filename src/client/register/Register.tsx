@@ -15,6 +15,7 @@ import './Register.scss';
 
 import { Page } from './../utils/types';
 import { validateMAC } from './../../shared/validate';
+import { authorizationRequest } from './../utils/fetch';
 
 export default function Register({
   setAuthorization,
@@ -39,7 +40,7 @@ export default function Register({
   }
 
   function handleClickShowPassword(prop: keyof typeof state) {
-    return function (event: React.MouseEvent) {
+    return function () {
       setState(state => ({
         ...state,
         [prop]: !state[prop],
@@ -62,20 +63,13 @@ export default function Register({
       return setState(state => ({ ...state, errorMessage: 'Password must be at least 3 characters long.' }));
     }
 
-    const response = await fetch('/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({ mac: state.mac, password: state.password }),
-    });
-    if (response.status !== 200) {
-      return setState(state => ({ ...state, errorMessage: 'Failed to create device. Device may already exist.' }));
-    }
-
-    const { token } = await response.json();
-    setAuthorization(state.mac, token);
+    await authorizationRequest(
+      '/api/register',
+      state.mac,
+      state.password,
+      error => setState(state => ({ ...state, errorMessage: error })),
+      setAuthorization
+    );
   }
 
   return (

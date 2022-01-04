@@ -15,6 +15,7 @@ import './Login.scss';
 
 import { Page } from './../utils/types';
 import { validateMAC } from './../../shared/validate';
+import { authorizationRequest } from './../utils/fetch';
 
 export default function Login({
   setAuthorization,
@@ -36,7 +37,7 @@ export default function Login({
     }
   }
 
-  function handleClickShowPassword(event: React.MouseEvent) {
+  function handleClickShowPassword() {
     setState(state => ({
       ...state,
       showPassword: !state.showPassword,
@@ -47,7 +48,6 @@ export default function Login({
     event.preventDefault();
   };
 
-  // TODO DRY this with same code in register view
   async function handleLoginSubmit() {
     if (!validateMAC(state.mac)) {
       return setState(state => ({ ...state, errorMessage: 'Invalid MAC address format.' }));
@@ -57,20 +57,13 @@ export default function Login({
       return setState(state => ({ ...state, errorMessage: 'Password must be at least 3 characters long.' }));
     }
 
-    const response = await fetch('/api/authenticate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({ mac: state.mac, password: state.password }),
-    });
-    if (response.status !== 200) {
-      return setState(state => ({ ...state, errorMessage: 'Failed to log into device. Device may not be registered.' }));
-    }
-
-    const { token } = await response.json();
-    setAuthorization(state.mac, token);
+    await authorizationRequest(
+      '/api/authenticate',
+      state.mac,
+      state.password,
+      error => setState(state => ({ ...state, errorMessage: error })),
+      setAuthorization
+    );
   }
 
   return (

@@ -2,17 +2,17 @@
   "name": "plant-auto-watering",
   "version": "0.0.1",
   "description": "Automating plant watering chores around the house.",
-  "main": "build/server/index.js",
+  "main": "dist/server/index.js",
   "scripts": {
     "clean": "rm -rf dist coverage",
     "test": "jest --coverage",
     "build:server": "cross-env NODE_ENV=production tsc -p ./src/server/tsconfig.json",
     "build-watch:server": "cross-env NODE_ENV=development tsc -p ./src/server/tsconfig.json --watch",
-    "start:server": "cross-env NODE_ENV=production node dist/server/index.js",
-    "start-dev:server": "cross-env NODE_ENV=development nodemon dist/server/index.js",
+    "start:server": "cross-env NODE_ENV=production node ./dist/server/index.js",
+    "start-dev:server": "cross-env NODE_ENV=development nodemon ./dist/server/index.js",
     "build:client": "cross-env NODE_ENV=production webpack",
     "start-dev:client": "cross-env NODE_ENV=development webpack serve",
-    "dev": "concurrently \"npm run build-watch:server\" \"npm run start-dev:server\" \"npm run start-dev:client\""
+    "dev": "concurrently \"npm run build-watch:server\" \"npm run start-dev:server\" \"npm run start-dev:client\" "
   },
   "repository": {
     "type": "git",

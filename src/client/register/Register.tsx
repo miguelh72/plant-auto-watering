@@ -13,10 +13,14 @@ import Typography from '@mui/material/Typography';
 
 import './Register.scss';
 
+import { Page } from './../utils/types';
+
 export default function Register({
   setToken,
+  setView,
 }: {
   setToken: (mac: string, token: string) => void;
+  setView: (view: Page) => void;
 }) {
   const [state, setState] = useState({
     errorMessage: '',
@@ -110,7 +114,7 @@ export default function Register({
 
         <Stack spacing={1}>
           <Button variant="contained">Register</Button>
-          <Button variant="outlined">Back To Login</Button>
+          <Button variant="outlined" onClick={() => setView(Page.Login)}>Back To Login</Button>
         </Stack>
 
       </Stack>

@@ -13,10 +13,14 @@ import Typography from '@mui/material/Typography';
 
 import './Login.scss';
 
+import { Page } from './../utils/types';
+
 export default function Login({
   setToken,
+  setView,
 }: {
   setToken: (mac: string, token: string) => void;
+  setView: (view: Page) => void;
 }) {
   const [state, setState] = useState({
     errorMessage: '',
@@ -83,7 +87,7 @@ export default function Login({
 
         <Stack spacing={1}>
           <Button variant="contained">Login</Button>
-          <Button variant="outlined">Register</Button>
+          <Button variant="outlined" onClick={() => setView(Page.Register)}>Register</Button>
         </Stack>
 
       </Stack>

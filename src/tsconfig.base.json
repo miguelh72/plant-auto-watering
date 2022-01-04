@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./../dist/server",
+    "outDir": "./../dist/",
     "alwaysStrict": true,
     "noImplicitAny": true,
     "noImplicitThis": true,

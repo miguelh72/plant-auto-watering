@@ -13,14 +13,17 @@ export default function SensorPumpPair({
   state,
   availableSensorPins,
   availablePumpPins,
+  showSaveButton,
+  saveState,
+  removeState,
 }: {
   state: State;
   availableSensorPins: number[];
   availablePumpPins: number[];
+  showSaveButton: boolean;
+  saveState: () => void;
+  removeState: () => void;
 }) {
-  // TODO keep internal copy of state, compare internal vs prop to know if change is pending
-  const [hasChanges, setHasChanges] = useState(false);
-
   availableSensorPins.sort((a, b) => a - b);
   availablePumpPins.sort((a, b) => a - b);
 
@@ -97,8 +100,8 @@ export default function SensorPumpPair({
       </Stack>
 
       <Stack direction='row'>
-        {hasChanges && <Button variant="contained" sx={{ maxWidth: 120, marginTop: 2 }}>Save</Button>}
-        <Button variant="outlined" color="error" sx={{ maxWidth: 120, marginTop: 2, marginLeft: 'auto' }}>Remove</Button>
+        {showSaveButton && <Button variant="contained" sx={{ maxWidth: 120, marginTop: 2 }} onClick={saveState}>Save</Button>}
+        <Button variant="outlined" color="error" sx={{ maxWidth: 120, marginTop: 2, marginLeft: 'auto' }} onClick={removeState}>Remove</Button>
       </Stack>
     </Stack>
   );

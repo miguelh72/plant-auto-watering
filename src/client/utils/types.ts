@@ -7,11 +7,13 @@ export enum Page {
   Settings,
 }
 
-export type ClientState = {
+export type ClientState = State & { hasChanges: boolean };
+
+export type AppState = {
   token: string;
   mac: string;
   settings: Settings | null;
-  states: State[] | null;
+  states: ClientState[] | null;
 };
 
-export type DeviceSetter = React.Dispatch<React.SetStateAction<ClientState | null>>;
+export type DeviceSetter = React.Dispatch<React.SetStateAction<AppState | null>>;

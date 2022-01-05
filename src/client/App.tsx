@@ -4,13 +4,13 @@ import Login from './login/Login';
 import Register from './register/Register';
 import Device from './device/Device';
 import Settings from './settings/Settings';
-import { Page, ClientState } from './utils/types';
+import { Page, AppState } from './utils/types';
 
 import './App.scss';
 
 export default function App() {
   const [view, setView] = useState<Page>(Page.Login);
-  const [device, setDevice] = useState<ClientState | null>(null);
+  const [device, setDevice] = useState<AppState | null>(null);
 
   // Can't access privileged views without a token
   if ((view !== Page.Login && view !== Page.Register) && !device) setView(Page.Login);

@@ -4,20 +4,20 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
-import { Page, ClientState } from './../utils/types';
-import { requestRemoveDevice } from './../utils/fetch';
+import { Page, AppState } from './../utils/types';
+import { removeDevice } from './../utils/fetch';
 
 export default function Settings({
   device,
   setDevice,
   setView,
 }: {
-  device: ClientState;
-  setDevice: (device: ClientState | null) => void;
+  device: AppState;
+  setDevice: (device: AppState | null) => void;
   setView: (view: Page) => void;
 }) {
   async function handleDeleteSubmit() {
-    requestRemoveDevice(
+    removeDevice(
       '/api/register',
       device.token,
       error => console.error(error), // TODO give user feedback

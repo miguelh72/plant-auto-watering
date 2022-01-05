@@ -115,6 +115,25 @@ describe('CRUD operations on device model', () => {
     expect(await deviceModel.readStates(mac1)).toMatchObject(deviceState);
   });
 
+  test('Update device with new element in states', async () => {
+    await deviceModel.createDevice(mac1, passhash1, settings1, []);
+
+    const clientState: ClientState[] = [
+      {
+        sensor: {
+          pin: 7,
+          threshold: 99,
+        },
+        pump: {
+          pin: 5,
+          speed: 145,
+        }
+      }
+    ];
+    expect(await deviceModel.updateClientStates(mac1, clientState)).toBe(true);
+    expect(await deviceModel.readStates(mac1)).toMatchObject(clientState);
+  });
+
   test('Delete device', async () => {
     await deviceModel.createDevice(mac1, passhash1, settings1, state1);
     await deviceModel.createDevice(mac2, passhash2, settings1, []);

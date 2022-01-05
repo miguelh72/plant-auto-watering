@@ -3,6 +3,9 @@
 
 import { Settings, State, Device, ShallowDevice, ClientState, DeviceState } from './../../shared/types';
 
+const DEFAULT_THRESHOLD = 100;
+const DEFAULT_SPEED = 255;
+
 let devices: Device[] = [];
 
 function deepCopy<T>(obj: T): T {
@@ -69,12 +72,29 @@ function updateStates(mac: string, newPartialState: ClientState[] | DeviceState[
   const deviceIndex = devices.findIndex(device => device.mac === mac);
   if (deviceIndex === -1) return false;
 
-  for (const partialState of newPartialState) {
+  for (const partialState of newPartialState as State[]) {
     const matchingStateIndex = devices[deviceIndex].states.findIndex(state => state.sensor.pin === partialState.sensor.pin);
-    if (matchingStateIndex === -1) return false;
+    if (matchingStateIndex === -1) {
+      // combination does not exist. Add it and return true
+      const newState: State = {
+        sensor: {
+          pin: partialState.sensor.pin,
+          threshold: partialState.sensor.threshold || DEFAULT_THRESHOLD,
+          level: partialState.sensor.level || 0,
+        },
+        pump: {
+          pin: partialState.pump.pin,
+          speed: partialState.pump.speed || DEFAULT_SPEED,
+          isActive: partialState.pump.isActive || false,
+          thresholdOffset: partialState.pump.thresholdOffset || 0,
+        },
+      };
 
-    Object.assign(devices[deviceIndex].states[matchingStateIndex].sensor, partialState.sensor);
-    Object.assign(devices[deviceIndex].states[matchingStateIndex].pump, partialState.pump);
+      devices[deviceIndex].states.push(newState);
+    } else {
+      Object.assign(devices[deviceIndex].states[matchingStateIndex].sensor, partialState.sensor);
+      Object.assign(devices[deviceIndex].states[matchingStateIndex].pump, partialState.pump);
+    }
   }
 
   return true;

@@ -1,5 +1,5 @@
-import { ClientState, DeviceSetter } from "./../utils/types";
-import { Settings, State } from './../../shared/types';
+import { AppState, DeviceSetter, ClientState } from "./../utils/types";
+import { Settings, State, ClientState as BackendClientState } from './../../shared/types';
 
 // TODO handle retries
 
@@ -48,7 +48,7 @@ export async function requestSettings(
   const { body: { settings, error } } = await makeRequest<{ settings: Settings, error: string }>(uri, 'GET', undefined, token);
 
   if (error) return setError(error);
-  setDevice((device: ClientState) => ({ ...device, settings }));
+  setDevice((device: AppState) => ({ ...device, settings }));
 }
 
 export async function requestStates(
@@ -60,17 +60,54 @@ export async function requestStates(
   const { body: { states, error } } = await makeRequest<{ states: State[], error: string }>(uri, 'GET', undefined, token);
 
   if (error) return setError(error);
-  setDevice((device: ClientState) => ({ ...device, states }));
+
+  const clientStates: ClientState[] = states.map((state: ClientState) => {
+    state.hasChanges = false;
+    return state;
+  });
+
+  setDevice((device: AppState) => ({
+    ...device,
+    states: clientStates,
+  }));
 }
 
-export async function requestRemoveDevice(
+export async function removeDevice(
   uri: string,
   token: string,
   setError: (error: string) => void,
   setDevice: DeviceSetter,
-) {
-  const { body: { error } } = await makeRequest<{ states: State[], error: string }>(uri, 'DELETE', undefined, token);
+): Promise<void> {
+  const { body: { error } } = await makeRequest<{ message: string, error: string }>(uri, 'DELETE', undefined, token);
 
   if (error) return setError(error);
   setDevice(null);
+}
+
+export async function updateStates(
+  uri: string,
+  token: string,
+  states: ClientState[],
+  setError: (error: string) => void,
+  setDevice: DeviceSetter,
+): Promise<void> {
+  const backendClientState: BackendClientState[] = states.map(state => ({
+    sensor: {
+      pin: state.sensor.pin,
+      threshold: state.sensor.threshold,
+    },
+    pump: {
+      pin: state.pump.pin,
+      speed: state.pump.speed,
+    }
+  }));
+
+  const { body: { error } } = await makeRequest<{ message: string, error: string }>(uri, 'PATCH', { states: backendClientState }, token);
+
+  if (error) return setError(error);
+
+  setDevice(device => {
+    if (!device || !device.states) return device;
+    return { ...device, states: device.states.map(state => ({ ...state, hasChanges: false })) };
+  });
 }

@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
 import { Page, ClientState } from './../utils/types';
+import { requestRemoveDevice } from './../utils/fetch';
 
 export default function Settings({
   device,
@@ -15,6 +16,15 @@ export default function Settings({
   setDevice: (device: ClientState | null) => void;
   setView: (view: Page) => void;
 }) {
+  async function handleDeleteSubmit() {
+    requestRemoveDevice(
+      '/api/register',
+      device.token,
+      error => console.error(error), // TODO give user feedback
+      setDevice,
+    )
+  }
+
   return (
     <div id="device">
       <Stack spacing={3} sx={{ padding: 4, borderRadius: 4, backgroundColor: '#fff' }}>
@@ -45,7 +55,7 @@ export default function Settings({
         </Stack>
 
         <Stack spacing={1} className='button-controls' sx={{ alignItems: 'center' }}>
-          <Button variant="contained" color="error">Delete Device</Button>
+          <Button variant="contained" color="error" onClick={handleDeleteSubmit}>Delete Device</Button>
         </Stack>
 
       </Stack>

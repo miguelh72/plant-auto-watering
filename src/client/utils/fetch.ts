@@ -1,6 +1,8 @@
 import { ClientState, DeviceSetter } from "./../utils/types";
 import { Settings, State } from './../../shared/types';
 
+// TODO handle retries
+
 async function makeRequest<T>(
   uri: string,
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
@@ -59,4 +61,16 @@ export async function requestStates(
 
   if (error) return setError(error);
   setDevice((device: ClientState) => ({ ...device, states }));
+}
+
+export async function requestRemoveDevice(
+  uri: string,
+  token: string,
+  setError: (error: string) => void,
+  setDevice: DeviceSetter,
+) {
+  const { body: { error } } = await makeRequest<{ states: State[], error: string }>(uri, 'DELETE', undefined, token);
+
+  if (error) return setError(error);
+  setDevice(null);
 }

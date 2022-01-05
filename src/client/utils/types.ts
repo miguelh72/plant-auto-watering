@@ -14,5 +14,4 @@ export type ClientState = {
   states: State[] | null;
 };
 
-export type DeviceSetter = ((setterFunc: (device: ClientState | null) => void) => void)
-  & ((device: ClientState | null) => void);
+export type DeviceSetter = React.Dispatch<React.SetStateAction<ClientState | null>>;

@@ -15,7 +15,7 @@ import './Register.scss';
 
 import { Page } from './../utils/types';
 import { validateMAC } from './../../shared/validate';
-import { authorizationRequest } from './../utils/fetch';
+import { requestAuthorization } from './../utils/fetch';
 
 export default function Register({
   setAuthorization,
@@ -63,7 +63,7 @@ export default function Register({
       return setState(state => ({ ...state, errorMessage: 'Password must be at least 3 characters long.' }));
     }
 
-    await authorizationRequest(
+    await requestAuthorization(
       '/api/register',
       state.mac,
       state.password,

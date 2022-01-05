@@ -24,7 +24,7 @@ async function makeRequest<T>(
   return { status: response.status, body: responseBody };
 }
 
-export async function authorizationRequest(
+export async function requestAuthorization(
   uri: string,
   mac: string,
   password: string,
@@ -37,7 +37,7 @@ export async function authorizationRequest(
   setAuthorization(mac, token);
 }
 
-export async function settingsRequest(
+export async function requestSettings(
   uri: string,
   token: string,
   setError: (error: string) => void,
@@ -49,7 +49,7 @@ export async function settingsRequest(
   setDevice((device: ClientState) => ({ ...device, settings }));
 }
 
-export async function statesRequest(
+export async function requestStates(
   uri: string,
   token: string,
   setError: (error: string) => void,

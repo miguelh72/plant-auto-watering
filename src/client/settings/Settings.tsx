@@ -4,14 +4,16 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 
-import { ClientState } from './../utils/types';
+import { Page, ClientState } from './../utils/types';
 
 export default function Settings({
   device,
   setDevice,
+  setView,
 }: {
   device: ClientState;
   setDevice: (device: ClientState | null) => void;
+  setView: (view: Page) => void;
 }) {
   return (
     <div id="device">
@@ -20,7 +22,7 @@ export default function Settings({
         <Typography variant='h5'><b>Device:</b> MAC {device.mac}</Typography>
 
         <Stack spacing={1} className='button-controls'>
-          <Button variant="outlined">Sensor-Pump Pairs</Button>
+          <Button variant="outlined" onClick={() => setView(Page.Device)}>Sensor-Pump Pairs</Button>
         </Stack>
 
         <Stack sx={{ border: '2px solid #999', padding: 2, borderRadius: 2 }} spacing={2}>

@@ -5,10 +5,10 @@ import Button from '@mui/material/Button';
 
 import './Device.scss';
 
-import { ClientState, DeviceSetter } from './../utils/types';
+import { Page, ClientState, DeviceSetter } from './../utils/types';
 import SensorPumpPair from './SensorPumpPair';
 import Splash from './../shared/Splash';
-import { settingsRequest, statesRequest } from './../utils/fetch';
+import { requestSettings, requestStates } from './../utils/fetch';
 
 // TODO make this a setting or let user type pin directly, need to research how arduino code names pins
 const SENSOR_PINS: number[] = [14, 15, 16, 17, 18, 19, 20, 21];
@@ -17,20 +17,22 @@ const PUMP_PINS: number[] = [3, 5, 6, 9, 10];
 export default function Device({
   device,
   setDevice,
+  setView,
 }: {
   device: ClientState;
   setDevice: DeviceSetter;
+  setView: (view: Page) => void;
 }) {
   useEffect(() => {
     // On component did mount, load settings and state
     // TODO handle failure retries
-    settingsRequest(
+    requestSettings(
       '/api/device/settings',
       device.token,
       error => console.error(error),
       setDevice
     );
-    statesRequest(
+    requestStates(
       '/api/device/states',
       device.token,
       error => console.error(error),
@@ -59,7 +61,7 @@ export default function Device({
         {(device.settings && device.states)
           ? <>
             <Stack spacing={1} className='button-controls'>
-              <Button variant="outlined">Edit Device Settings</Button>
+              <Button variant="outlined" onClick={() => setView(Page.Settings)}>Edit Device Settings</Button>
               <Button variant="contained">Add Sensor-Pump Pair</Button>
             </Stack>
 

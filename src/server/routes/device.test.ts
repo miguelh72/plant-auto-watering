@@ -41,9 +41,9 @@ describe('API testing device endpoints', () => {
     test('Fetch settings for a device', async () => {
       return supertest(app)
         .get('/api/device/settings')
-        .send({ token })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', token)
         .expect('Content-Type', /application\/json/)
         .expect(200)
         .then(async result => {
@@ -56,9 +56,9 @@ describe('API testing device endpoints', () => {
 
       return supertest(app)
         .get('/api/device/settings')
-        .send({ token: invalidToken })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(400)
         .then(async result => {
@@ -67,13 +67,13 @@ describe('API testing device endpoints', () => {
     });
 
     test('Fetch settings for a device that doesn\'t exist', async () => {
-      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+      const invalidToken: string = await getJWT('11:1A:C2:7B:22:47') as string;
 
       return supertest(app)
         .get('/api/device/settings')
-        .send({ token: invalidToken })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(500)
         .then(async result => {
@@ -86,9 +86,9 @@ describe('API testing device endpoints', () => {
     test('Fetch states for a device', async () => {
       return supertest(app)
         .get('/api/device/states')
-        .send({ token })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', token)
         .expect('Content-Type', /application\/json/)
         .expect(200)
         .then(async result => {
@@ -101,9 +101,9 @@ describe('API testing device endpoints', () => {
 
       return supertest(app)
         .get('/api/device/states')
-        .send({ token: invalidToken })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(400)
         .then(async result => {
@@ -112,13 +112,13 @@ describe('API testing device endpoints', () => {
     });
 
     test('Fetch states for a device that doesn\'t exist', async () => {
-      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+      const invalidToken: string = await getJWT('11:1A:C2:7B:22:47') as string;
 
       return supertest(app)
         .get('/api/device/states')
-        .send({ token: invalidToken })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(500)
         .then(async result => {
@@ -133,9 +133,10 @@ describe('API testing device endpoints', () => {
     test('Update device password', async () => {
       return supertest(app)
         .patch('/api/device/password')
-        .send({ token, password: newPassword })
+        .send({ password: newPassword })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', token)
         .expect('Content-Type', /application\/json/)
         .expect(200)
         .then(async result => {
@@ -151,9 +152,10 @@ describe('API testing device endpoints', () => {
 
       return supertest(app)
         .patch('/api/device/password')
-        .send({ token: invalidToken, password: newPassword })
+        .send({ password: newPassword })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(400)
         .then(async result => {
@@ -165,13 +167,14 @@ describe('API testing device endpoints', () => {
     });
 
     test('Attempt to update device password for device that doesn\'t exist', async () => {
-      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+      const invalidToken: string = await getJWT('11:1A:C2:7B:22:47') as string;
 
       return supertest(app)
         .patch('/api/device/password')
-        .send({ token: invalidToken, password: newPassword })
+        .send({ password: newPassword })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(500)
         .then(async result => {
@@ -189,9 +192,10 @@ describe('API testing device endpoints', () => {
     test('Update device settings', async () => {
       return supertest(app)
         .patch('/api/device/settings')
-        .send({ token, settings: newSettings })
+        .send({ settings: newSettings })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', token)
         .expect('Content-Type', /application\/json/)
         .expect(200)
         .then(async result => {
@@ -207,9 +211,10 @@ describe('API testing device endpoints', () => {
 
       return supertest(app)
         .patch('/api/device/settings')
-        .send({ token: invalidToken, settings: newSettings })
+        .send({ settings: newSettings })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(400)
         .then(async result => {
@@ -221,13 +226,14 @@ describe('API testing device endpoints', () => {
     });
 
     test('Attempt to update device settings for device that doesn\'t exist', async () => {
-      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+      const invalidToken: string = await getJWT('11:1A:C2:7B:22:47') as string;
 
       return supertest(app)
         .patch('/api/device/settings')
-        .send({ token: invalidToken, settings: newSettings })
+        .send({ settings: newSettings })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(500)
         .then(async result => {
@@ -256,9 +262,10 @@ describe('API testing device endpoints', () => {
     test('Update device client states', async () => {
       return supertest(app)
         .patch('/api/device/states/client')
-        .send({ token, states: newClientStates })
+        .send({ states: newClientStates })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', token)
         .expect('Content-Type', /application\/json/)
         .expect(200)
         .then(async result => {
@@ -274,9 +281,10 @@ describe('API testing device endpoints', () => {
 
       return supertest(app)
         .patch('/api/device/states/client')
-        .send({ token: invalidToken, states: newClientStates })
+        .send({ states: newClientStates })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(400)
         .then(async result => {
@@ -288,13 +296,14 @@ describe('API testing device endpoints', () => {
     });
 
     test('Attempt to update client states for device that doesn\'t exist', async () => {
-      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+      const invalidToken: string = await getJWT('11:1A:C2:7B:22:47') as string;
 
       return supertest(app)
         .patch('/api/device/states/client')
-        .send({ token: invalidToken, states: newClientStates })
+        .send({ states: newClientStates })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(500)
         .then(async result => {
@@ -324,9 +333,10 @@ describe('API testing device endpoints', () => {
     test('Update device device states', async () => {
       return supertest(app)
         .patch('/api/device/states/device')
-        .send({ token, states: newDeviceStates })
+        .send({ states: newDeviceStates })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', token)
         .expect('Content-Type', /application\/json/)
         .expect(200)
         .then(async result => {
@@ -342,9 +352,10 @@ describe('API testing device endpoints', () => {
 
       return supertest(app)
         .patch('/api/device/states/device')
-        .send({ token: invalidToken, states: newDeviceStates })
+        .send({ states: newDeviceStates })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(400)
         .then(async result => {
@@ -356,13 +367,14 @@ describe('API testing device endpoints', () => {
     });
 
     test('Attempt to update device states for device that doesn\'t exist', async () => {
-      const invalidToken = await getJWT('11:1A:C2:7B:22:47');
+      const invalidToken: string = await getJWT('11:1A:C2:7B:22:47') as string;
 
       return supertest(app)
         .patch('/api/device/states/device')
-        .send({ token: invalidToken, states: newDeviceStates })
+        .send({ states: newDeviceStates })
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
+        .set('Token', invalidToken)
         .expect('Content-Type', /application\/json/)
         .expect(500)
         .then(async result => {

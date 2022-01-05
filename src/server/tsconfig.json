@@ -3,6 +3,9 @@
   "include": [
     "./**/*"
   ],
+  "exclude": [
+    "./**/*.test.*"
+  ],
   "compilerOptions": {
     "module": "CommonJS",
     "esModuleInterop": true

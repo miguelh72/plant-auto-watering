@@ -46,13 +46,13 @@ describe('API testing registration endpoints', () => {
 
   test('Remove a device', async () => {
     await deviceModel.createDevice(mac, await getPasshash(password), { pollFrequency: 1000 }, []);
-    const token = await getJWT(mac);
+    const token: string = await getJWT(mac) as string;
 
     return supertest(app)
       .delete('/api/register')
-      .send({ token })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
+      .set('Token', token)
       .expect('Content-Type', /application\/json/)
       .expect(200)
       .then(async result => {
@@ -67,9 +67,9 @@ describe('API testing registration endpoints', () => {
 
     return supertest(app)
       .delete('/api/register')
-      .send({ token: invalidToken })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
+      .set('Token', invalidToken)
       .expect('Content-Type', /application\/json/)
       .expect(401)
       .then(async result => {
@@ -80,13 +80,13 @@ describe('API testing registration endpoints', () => {
 
   test('Attempt to remove device that doesn\'t exist', async () => {
     await deviceModel.createDevice(mac, await getPasshash(password), { pollFrequency: 1000 }, []);
-    const invalidToken = await getJWT('11:1A:C2:7B:22:33');
+    const invalidToken: string = await getJWT('11:1A:C2:7B:22:33') as string;
 
     return supertest(app)
       .delete('/api/register')
-      .send({ token: invalidToken })
       .set('Accept', 'application/json')
       .set('Content-Type', 'application/json')
+      .set('Token', invalidToken)
       .expect('Content-Type', /application\/json/)
       .expect(500)
       .then(async result => {

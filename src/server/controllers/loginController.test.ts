@@ -61,7 +61,7 @@ describe('Test login controller', () => {
 
   test('Validate token', async () => {
     let token: string = await getJWT(mac) as string;
-    mockRequest = { body: { token } };
+    mockRequest = { headers: { token } };
 
     await validateJWT(mockRequest as Request, mockResponse as Response, nextFunction);
 
@@ -71,7 +71,7 @@ describe('Test login controller', () => {
 
     // different token
     token = await getJWT('11:1A:C2:7B:27:1A') as string;
-    mockRequest = { body: { token } };
+    mockRequest = { headers: { token } };
     mockResponse = {
       locals: {},
     };
@@ -83,7 +83,7 @@ describe('Test login controller', () => {
     expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // invalid token
-    mockRequest = { body: { token: 'NotAValidToken' } };
+    mockRequest = { headers: { token: 'NotAValidToken' } };
     mockResponse = {
       locals: {},
     };
@@ -95,7 +95,7 @@ describe('Test login controller', () => {
     expect(nextFunction).toHaveBeenCalledTimes(1);
 
     // unset token
-    mockRequest = { body: {} };
+    mockRequest = { headers: {} };
     mockResponse = {
       locals: {},
     };

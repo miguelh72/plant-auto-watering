@@ -13,3 +13,6 @@ export type ClientState = {
   settings: Settings | null;
   states: State[] | null;
 };
+
+export type DeviceSetter = ((setterFunc: (device: ClientState | null) => void) => void)
+  & ((device: ClientState | null) => void);

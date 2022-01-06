@@ -6,7 +6,7 @@
 
 struct EventQueueItem
 {
-  String name;
+  char *name;
   void *payload; // Can be cast to any foo*
 };
 
@@ -14,22 +14,23 @@ struct EventQueueItem
 
 struct EventListItem
 {
-  String name;
-  LinkedList<void (*)(void *payload)> subscribers;
+  char *name;
+  LinkedList<void (*)(void *payload)> *subscribers;
 };
 
 class EventQueue
 {
 public:
-  static void on(String eventName, void (*callback)(void *payload));
+  static void on(char *eventName, void (*callback)(void *payload));
   // static void remove(String eventName, void (*callback)(void *payload));
   // static void emit(String eventName, void *payload);
   // static void handleEvents();
+  static void printEvents();
 
 protected:
 private:
-  LinkedList<EventQueueItem> queue;
-  LinkedList<EventListItem> events;
+  static LinkedList<EventQueueItem *> *queue;
+  static LinkedList<EventListItem *> *events;
 };
 
 #endif

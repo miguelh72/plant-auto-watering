@@ -1,5 +1,4 @@
 #include "LinkedListLib.h"
-#include "EventQueue.h"
 
 void printArray(int *x, int length)
 {
@@ -32,9 +31,10 @@ void setup()
     ; // wait for serial port to connect. Needed for native USB
   }
 
-  EventQueue::on("TestEventName", &test);
+  Test *st = new Test();
+  st->value = "hello world";
 
-  EventQueue::printEvents();
+  Serial.println(st->value);
 
   /*
     // How to pass struct by reference
@@ -52,6 +52,5 @@ void setup()
 
 void loop()
 {
-
   delay(1000);
 }

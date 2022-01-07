@@ -1,4 +1,6 @@
 #include "LinkedListLib.h"
+#include "UnitTest.h"
+
 #include "EventQueue.h"
 
 void printArray(int *x, int length)

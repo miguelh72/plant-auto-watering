@@ -1,8 +1,8 @@
 #ifndef EventQueue_h
 #define EventQueue_h
 
-// https://github.com/luisllamasbinaburo/Arduino-LinkedList
-#include "LinkedListLib.h"
+// https://github.com/ivanseidel/LinkedList
+#include "LinkedList.h"
 
 struct EventQueueItem
 {
@@ -21,16 +21,18 @@ struct EventListItem
 class EventQueue
 {
 public:
+  // Had to expose these for testing purposes, should be private
+  static LinkedList<EventQueueItem *> *_queue;
+  static LinkedList<EventListItem *> *_events;
+
   static void on(char *eventName, void (*callback)(void *payload));
-  // static void remove(String eventName, void (*callback)(void *payload));
+  static bool remove(char *eventName, void (*callback)(void *payload));
   // static void emit(String eventName, void *payload);
   // static void handleEvents();
   static void printEvents();
 
 protected:
 private:
-  static LinkedList<EventQueueItem *> *queue;
-  static LinkedList<EventListItem *> *events;
 };
 
 #endif

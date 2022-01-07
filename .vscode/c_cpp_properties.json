@@ -18,7 +18,7 @@
             "includePath": [
                 "C:\\Users\\Miguel\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.4\\cores\\arduino",
                 "C:\\Users\\Miguel\\AppData\\Local\\Arduino15\\packages\\arduino\\hardware\\avr\\1.8.4\\variants\\eightanaloginputs",
-                "C:\\Users\\Miguel\\Documents\\Arduino\\libraries\\LinkedListLib\\src",
+                "C:\\Users\\Miguel\\Documents\\Arduino\\libraries\\**",
                 "c:\\users\\miguel\\appdata\\local\\arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino7\\lib\\gcc\\avr\\7.3.0\\include",
                 "c:\\users\\miguel\\appdata\\local\\arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino7\\lib\\gcc\\avr\\7.3.0\\include-fixed",
                 "c:\\users\\miguel\\appdata\\local\\arduino15\\packages\\arduino\\tools\\avr-gcc\\7.3.0-atmel3.6.1-arduino7\\avr\\include"

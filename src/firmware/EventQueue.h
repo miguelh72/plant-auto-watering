@@ -4,6 +4,8 @@
 // https://github.com/ivanseidel/LinkedList
 #include "LinkedList.h"
 
+// TODO add comments, create external repo, add to Arduino library
+
 struct EventQueueItem
 {
   char *name;
@@ -28,8 +30,7 @@ public:
   static void on(char *eventName, void (*callback)(void *payload));
   static bool remove(char *eventName, void (*callback)(void *payload));
   static void emit(char *eventName, void *payload);
-  // static void handleEvents();
-  static void printEvents();
+  static void handleEvents();
 
 protected:
 private:

@@ -5,7 +5,7 @@ LinkedList<EventQueueItem *> *EventQueue::_queue = new LinkedList<EventQueueItem
 
 void EventQueue::on(char *eventName, void (*callback)(void *payload))
 {
-  // Find EventQueueItem with matching eventName, if it exists
+  // Find EventListItem with matching eventName, if it exists
   for (int i = 0; i < EventQueue::_events->size(); i++)
   {
     EventListItem *node = EventQueue::_events->get(i);
@@ -34,7 +34,7 @@ void EventQueue::on(char *eventName, void (*callback)(void *payload))
  */
 bool EventQueue::remove(char *eventName, void (*callback)(void *payload))
 {
-  // Find EventQueueItem with matching eventName, if it exists
+  // Find EventListItem with matching eventName, if it exists
   for (int i = 0; i < EventQueue::_events->size(); i++)
   {
     EventListItem *node = EventQueue::_events->get(i);
@@ -69,19 +69,31 @@ void EventQueue::emit(char *eventName, void *payload)
   EventQueue::_queue->add(node);
 }
 
-void EventQueue::printEvents()
+/**
+ * Add this function call to end of loop function.
+ */
+void EventQueue::handleEvents()
 {
-  Serial.println("START EVENT LIST");
+  if (EventQueue::_queue->size() == 0)
+  {
+    return;
+  }
 
+  EventQueueItem *eventItem = EventQueue::_queue->shift();
+
+  // Find EventListItem with matching eventName, if it exists
   for (int i = 0; i < EventQueue::_events->size(); i++)
   {
     EventListItem *node = EventQueue::_events->get(i);
-    char *name = node->name;
-    int numSubscribers = node->subscribers->size();
 
-    Serial.println(String(">> Event name: ") + String(name));
-    Serial.println(String(">> Num. subscribers: ") + String(numSubscribers));
+    if (node->name == eventItem->name)
+    {
+      // If it exists, call all callbacks with payload
+      for (int j = 0; j < node->subscribers->size(); j++)
+      {
+        void (*callback)(void *payload) = node->subscribers->get(j);
+        callback(eventItem->payload);
+      }
+    }
   }
-
-  Serial.println("END EVENT LIST");
 }

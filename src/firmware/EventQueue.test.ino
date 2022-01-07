@@ -16,15 +16,13 @@ void setup()
   TEST_RUN("Listener functions receive emitted event and correct payload.", testEmittingEvent);
 }
 
-void loop()
-{
-  ;
-}
+void loop() {}
 
 void cleanup()
 {
   // Note: this is absolutely causing memory leaks it just doesn't matter in the context of this small test
   EventQueue::_events = new LinkedList<EventListItem *>();
+  EventQueue::_queue = new LinkedList<EventQueueItem *>();
 }
 
 void testCallback(void *payload) {}
@@ -57,6 +55,13 @@ void testRemoveEventListener()
 
 void testEmittingEvent()
 {
-  // TODO
-  ASSERT_EQUAL_INT(EventQueue::_events->size(), 0);
+  char *eventName = "TestEventName";
+  char *payloadString = "TestPayload";
+  EventQueue::emit(eventName, (void *)payloadString);
+
+  ASSERT_EQUAL_INT(EventQueue::_queue->size(), 1);
+  ASSERT_EQUAL_STRING(String(EventQueue::_queue->get(0)->name), String(eventName));
+  ASSERT_EQUAL_POINTER(EventQueue::_queue->get(0)->payload, payloadString);
+
+  cleanup();
 }

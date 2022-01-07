@@ -1,6 +1,7 @@
 #include "EventQueue.h"
 
 LinkedList<EventListItem *> *EventQueue::_events = new LinkedList<EventListItem *>();
+LinkedList<EventQueueItem *> *EventQueue::_queue = new LinkedList<EventQueueItem *>();
 
 void EventQueue::on(char *eventName, void (*callback)(void *payload))
 {
@@ -8,7 +9,8 @@ void EventQueue::on(char *eventName, void (*callback)(void *payload))
   for (int i = 0; i < EventQueue::_events->size(); i++)
   {
     EventListItem *node = EventQueue::_events->get(i);
-    if (String(node->name).compareTo(eventName) == 0)
+
+    if (node->name == eventName)
     {
       // If it exists, Push callback
       node->subscribers->add(callback);
@@ -36,7 +38,8 @@ bool EventQueue::remove(char *eventName, void (*callback)(void *payload))
   for (int i = 0; i < EventQueue::_events->size(); i++)
   {
     EventListItem *node = EventQueue::_events->get(i);
-    if (String(node->name).compareTo(eventName) == 0)
+
+    if (node->name == eventName)
     {
       // If it exists, search for matching function
       for (int j = 0; j < node->subscribers->size(); j++)
@@ -54,6 +57,16 @@ bool EventQueue::remove(char *eventName, void (*callback)(void *payload))
   }
 
   return false;
+}
+
+void EventQueue::emit(char *eventName, void *payload)
+{
+  EventQueueItem *node = new EventQueueItem();
+  node->name = eventName;
+  node->payload = payload;
+
+  // Push event to queue
+  EventQueue::_queue->add(node);
 }
 
 void EventQueue::printEvents()

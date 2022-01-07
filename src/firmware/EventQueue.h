@@ -27,7 +27,7 @@ public:
 
   static void on(char *eventName, void (*callback)(void *payload));
   static bool remove(char *eventName, void (*callback)(void *payload));
-  // static void emit(String eventName, void *payload);
+  static void emit(char *eventName, void *payload);
   // static void handleEvents();
   static void printEvents();
 

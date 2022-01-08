@@ -354,3 +354,4 @@ dist
 bin
 coverage
 package-lock.json
+.vscode/*properties.json

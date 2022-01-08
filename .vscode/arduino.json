@@ -1,8 +1,4 @@
 {
     "board": "arduino:avr:nano",
-    "programmer": "arduino:avrisp",
-    "sketch": "src\\firmware\\index.ino",
-    "output": "bin",
-    "port": "COM4",
-    "configuration": "cpu=atmega328"
+    "port": "COM4"
 }

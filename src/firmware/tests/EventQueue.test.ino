@@ -1,17 +1,16 @@
-//#include "LinkedListLib.h"
 #include "UnitTest.h"
 
 #include "EventQueue.h"
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial)
   {
     ; // wait for serial port to connect. Needed for native USB
   }
 
-  TEST_RUN("Register an event listener function to a specific event name.", testRegisterEventListener);
+  TEST_RUN("Register an event listener function to a specific event name.", testRegisterSetTimeoutCallback);
   TEST_RUN("Register an event listener function to a specific event name.", testRemoveEventListener);
   TEST_RUN("Listener functions receive emitted event and correct payload.", testEmittingEvent);
   TEST_RUN("Event listeners are triggered after event is emitted on handle function call", testListenerReceivesEvent);
@@ -29,7 +28,7 @@ void cleanup()
 void testCallback(void *payload) {}
 void testCallback2(void *payload) {}
 
-void testRegisterEventListener()
+void testRegisterSetTimeoutCallback()
 {
   char *eventName = "TestEventName";
   EventQueue::on(eventName, &testCallback);

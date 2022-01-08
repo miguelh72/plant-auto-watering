@@ -1,4 +1,3 @@
-
 #include "EventQueue.h"
 
 // Optionally use BAUD_RATE directive to set a specific baud rate for serial communication.
@@ -32,30 +31,4 @@ void loop()
   }
 
   EventQueue::handleEvents();
-}
-
-void printSerial(void *payload)
-{
-  Serial.println("Serial");
-  EventQueue::on("loop", &printLoop);
-}
-
-int times = 0;
-
-void printLoop(void *payload)
-{
-  // Serial.println(times);
-
-  times++;
-
-  if (times % 10000 == 0)
-  {
-    times = 0;
-    Serial.println("Loop");
-  }
-}
-
-void once()
-{
-  EventQueue::on("serial_connected", &printSerial);
 }

@@ -47,6 +47,7 @@ bool EventQueue::remove(char *eventName, void (*callback)(void *payload))
         if (node->subscribers->get(j) == callback)
         {
           node->subscribers->remove(j);
+          // TODO remove EventListItem if there are no subscribers left
           return true;
         }
       }
@@ -79,21 +80,29 @@ void EventQueue::handleEvents()
     return;
   }
 
-  EventQueueItem *eventItem = EventQueue::_queue->shift();
-
-  // Find EventListItem with matching eventName, if it exists
-  for (int i = 0; i < EventQueue::_events->size(); i++)
+  // Handle only the current number of events in case any callback generate new events,
+  // which should wait until the next loop cycle
+  const int currentNumOfEvents = EventQueue::_queue->size();
+  for (int i = 0; i < currentNumOfEvents; i++)
   {
-    EventListItem *node = EventQueue::_events->get(i);
+    EventQueueItem *eventItem = EventQueue::_queue->shift();
 
-    if (node->name == eventItem->name)
+    // Find EventListItem with matching eventName, if it exists
+    for (int i = 0; i < EventQueue::_events->size(); i++)
     {
-      // If it exists, call all callbacks with payload
-      for (int j = 0; j < node->subscribers->size(); j++)
+      EventListItem *node = EventQueue::_events->get(i);
+
+      if (node->name == eventItem->name)
       {
-        void (*callback)(void *payload) = node->subscribers->get(j);
-        callback(eventItem->payload);
+        // If it exists, call all callbacks with payload
+        for (int j = 0; j < node->subscribers->size(); j++)
+        {
+          void (*callback)(void *payload) = node->subscribers->get(j);
+          callback(eventItem->payload);
+        }
       }
     }
+
+    delete eventItem;
   }
 }

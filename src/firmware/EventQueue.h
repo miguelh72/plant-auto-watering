@@ -17,7 +17,7 @@ struct EventQueueItem
 struct EventListItem
 {
   char *name;
-  LinkedList<void (*)(void *payload)> *subscribers;
+  LinkedList<void (*)(void *)> *subscribers;
 };
 
 class EventQueue

@@ -97,7 +97,7 @@ void EventQueue::handleEvents()
         // If it exists, call all callbacks with payload
         for (int j = 0; j < node->subscribers->size(); j++)
         {
-          void (*callback)(void *payload) = node->subscribers->get(j);
+          void (*callback)(void *) = node->subscribers->get(j);
           callback(eventItem->payload);
         }
       }
